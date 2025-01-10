@@ -164,19 +164,23 @@ package
       
       public function isItemProtected(item:Object) : Boolean
       {
+         var t1:*;
          try
          {
             if(!this.config || !this.config.protectionConfig)
             {
                Logger.get().error("Unable to check item protection, config not loaded");
-               ShowHUDMessage("Unable to check item protection, config not loaded",true);
                return false;
             }
+            t1 = getTimer();
             if(this.parentClip.MenuMode == SecureTradeShared.MODE_NPCVENDING)
             {
                if(ItemProtection.isProtected(item,this.config.protectionConfig.saleProtection))
                {
-                  Logger.get().info(item.text + " is Sale protected: " + ItemProtection.ProtectionReason);
+                  if(this.config.protectionConfig.debug)
+                  {
+                     Logger.get().info(item.text + " is Sale protected: " + ItemProtection.ProtectionReason + " (" + (getTimer() - t1) + "ms)");
+                  }
                   return true;
                }
             }
@@ -184,16 +188,25 @@ package
             {
                if(ItemProtection.isProtected(item,this.config.protectionConfig.scrapProtection))
                {
-                  Logger.get().info(item.text + " is Scrap protected: " + ItemProtection.ProtectionReason);
+                  if(this.config.protectionConfig.debug)
+                  {
+                     Logger.get().info(item.text + " is Scrap protected: " + ItemProtection.ProtectionReason + " (" + (getTimer() - t1) + "ms)");
+                  }
                   return true;
                }
             }
             else if(ItemProtection.isProtected(item,this.config.protectionConfig.transferProtection))
             {
-               Logger.get().info(item.text + " is Transfer protected: " + ItemProtection.ProtectionReason);
+               if(this.config.protectionConfig.debug)
+               {
+                  Logger.get().info(item.text + " is Transfer protected: " + ItemProtection.ProtectionReason + " (" + (getTimer() - t1) + "ms)");
+               }
                return true;
             }
-            Logger.get().info(item.text + " is not protected");
+            if(this.config.protectionConfig.debug)
+            {
+               Logger.get().info(item.text + " is not protected (" + (getTimer() - t1) + "ms)");
+            }
             return false;
          }
          catch(e:Error)
@@ -371,8 +384,8 @@ package
          this.initButtonHints();
          this.initDurabilityValue();
          this.initScrollPosition();
+         this.initItemProtection();
          CategoryWeight.init(this._parent);
-         ItemProtection.init(this._parent);
          LegendaryMods.init();
          stage.addEventListener(KeyboardEvent.KEY_UP,this.keyUpHandler);
          stage.addEventListener(KeyboardEvent.KEY_DOWN,this.keyDownHandler);
@@ -523,6 +536,23 @@ package
          {
             Logger.get().error("Error initDurabilityValue: " + e);
             ShowHUDMessage("Error initDurabilityValue: " + e,true);
+         }
+      }
+      
+      private function initItemProtection() : void
+      {
+         try
+         {
+            if(config != null && config.protectionConfig != null)
+            {
+               ItemProtection.init(this._parent);
+               this._parent.CheckItemProtectionOnSelectionChange = Parser.parseBoolean(config.protectionConfig.checkOnSelectionChange,true);
+            }
+         }
+         catch(e:Error)
+         {
+            Logger.get().error("Error initItemProtection: " + e);
+            ShowHUDMessage("Error initItemProtection: " + e,true);
          }
       }
       

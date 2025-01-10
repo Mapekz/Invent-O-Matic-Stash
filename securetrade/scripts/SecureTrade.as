@@ -289,6 +289,8 @@ package
       
       private var maxtabs:uint = 14;
       
+      private var checkItemProtectionOnSelectionChange:Boolean = false;
+      
       private var m_IsOpen:Boolean = false;
       
       private var m_PreviousFocus:InteractiveObject;
@@ -435,18 +437,6 @@ package
          this.m_CurrencyType = 4294967295;
          this.m_MenuMode = 4294967295;
          this.m_CurrencyType = 4294967295;
-         this.m_MenuMode = 4294967295;
-         this.m_CurrencyType = 4294967295;
-         this.m_MenuMode = 4294967295;
-         this.m_CurrencyType = 4294967295;
-         this.m_MenuMode = 4294967295;
-         this.m_CurrencyType = 4294967295;
-         this.m_MenuMode = 4294967295;
-         this.m_CurrencyType = 4294967295;
-         this.m_MenuMode = 4294967295;
-         this.m_CurrencyType = 4294967295;
-         this.m_MenuMode = 4294967295;
-         this.m_CurrencyType = 4294967295;
          this.__SFCodeObj = new Object();
          this.ButtonPlayerInventory = new BSButtonHintData("$TransferPlayerLabel","LT","PSN_L2_Alt","Xenon_L2_Alt",1,this.onSwapInventoryPlayer);
          this.ButtonContainerInventory = new BSButtonHintData("$TransferContainerLabel","RT","PSN_R2_Alt","Xenon_R2_Alt",1,this.onSwapInventoryContainer);
@@ -573,6 +563,11 @@ package
          return this.maxtabs;
       }
       
+      public function set CheckItemProtectionOnSelectionChange(value:Boolean) : void
+      {
+         this.checkItemProtectionOnSelectionChange = value;
+      }
+      
       public function set MaintainScrollPosition(value:uint) : void
       {
          this.maintainScrollPosition = value;
@@ -616,8 +611,12 @@ package
          },25);
       }
       
-      public function isItemProtected(item:Object) : Boolean
+      public function isItemProtected(item:Object, isSelectionChanged:Boolean = false) : Boolean
       {
+         if(isSelectionChanged && !this.checkItemProtectionOnSelectionChange)
+         {
+            return false;
+         }
          if(this.selectedList == this.PlayerInventory_mc && this.modLoader && this.modLoader.content && this.modLoader.content.isItemProtected(item))
          {
             return true;
@@ -2919,7 +2918,7 @@ package
             this.ScrapButton.ButtonVisible = !_loc5_ && (this.m_isWorkbench || this.m_isWorkshop) && this.m_scrapAllowedFlag != 0;
             if(this.ScrapButton.ButtonVisible)
             {
-               this.ScrapButton.ButtonDisabled = _loc2_.scrapAllowed != true || (_loc2_.filterFlag & this.m_scrapAllowedFlag) == 0;
+               this.ScrapButton.ButtonDisabled = _loc2_.scrapAllowed != true || (_loc2_.filterFlag & this.m_scrapAllowedFlag) == 0 || this.isItemProtected(this.selectedListEntry,true);
             }
             this.StoreUnusedItemsButton.ButtonVisible = this.m_isWorkbench || this.m_isWorkshop || this.m_isStash || this.isLimitedStorage;
             if(this.StoreUnusedItemsButton.ButtonVisible)
@@ -2974,7 +2973,7 @@ package
                   this.InspectButton.ButtonVisible = true;
                   if(this.AcceptButton.ButtonVisible)
                   {
-                     this.AcceptButton.ButtonDisabled = false;
+                     this.AcceptButton.ButtonDisabled = !this.m_isStash && this.isItemProtected(this.selectedListEntry,true);
                      if(_loc4_)
                      {
                         this.AcceptButton.ButtonText = this.m_AcceptBtnText_Container;
@@ -3001,7 +3000,7 @@ package
                   this.InspectButton.ButtonVisible = true;
                   if(this.AcceptButton.ButtonVisible)
                   {
-                     this.AcceptButton.ButtonDisabled = !_loc4_ && this.m_VendorSellOnly;
+                     this.AcceptButton.ButtonDisabled = !_loc4_ && (this.m_VendorSellOnly || this.isItemProtected(this.selectedListEntry,true));
                      this.AcceptButton.ButtonText = !!_loc4_ ? "$BUY" : "$SELL";
                   }
                   this.TakeAllButton.ButtonVisible = false;

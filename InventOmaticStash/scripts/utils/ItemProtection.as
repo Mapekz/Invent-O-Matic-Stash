@@ -14,6 +14,8 @@ package utils
       private static var _protectionReason:String = "";
       
       private static var secureTrade:Object;
+      
+      private static var itemProtection:* = {};
        
       
       public function ItemProtection()
@@ -38,14 +40,20 @@ package utils
          {
             return false;
          }
+         if(itemProtection[item.serverHandleId] != null)
+         {
+            return itemProtection[item.serverHandleId];
+         }
          if(config.equipped && item.equipState == 1)
          {
             _protectionReason = EQUIPPED;
+            itemProtection[item.serverHandleId] = true;
             return true;
          }
          if(config.favorite && item.favorite)
          {
             _protectionReason = FAVORITE;
+            itemProtection[item.serverHandleId] = true;
             return true;
          }
          if(config.named && config.itemNames && config.itemNames.length > 0 && config.matchMode)
@@ -67,6 +75,7 @@ package utils
                if(ItemWorker.isMatchingString(item.text,itemNames[i],config.matchMode))
                {
                   _protectionReason = NAMED;
+                  itemProtection[item.serverHandleId] = true;
                   return true;
                }
                i++;
@@ -77,6 +86,7 @@ package utils
             _protectionReason = MAX_CURRENCY;
             return true;
          }
+         itemProtection[item.serverHandleId] = false;
          return false;
       }
    }
