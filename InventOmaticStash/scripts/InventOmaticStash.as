@@ -385,6 +385,7 @@ package
          this.initDurabilityValue();
          this.initScrollPosition();
          this.initHideTakeAll();
+         this.initDefaultVendorItemPrice();
          this.initItemProtection();
          CategoryWeight.init(this._parent);
          LegendaryMods.init();
@@ -580,6 +581,19 @@ package
          {
             Logger.get().error("Error initHideTakeAll: " + e);
             ShowHUDMessage("Error initHideTakeAll: " + e,true);
+         }
+      }
+      
+      private function initDefaultVendorItemPrice() : void
+      {
+         try
+         {
+            this._parent.DefaultVendorItemPrice = Parser.parseNumber(config.defaultVendorItemPrice,-1);
+         }
+         catch(e:Error)
+         {
+            Logger.get().error("Error initDefaultVendorItemPrice: " + e);
+            ShowHUDMessage("Error initDefaultVendorItemPrice: " + e,true);
          }
       }
       
