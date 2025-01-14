@@ -387,6 +387,7 @@ package
          this.initHideTakeAll();
          this.initDefaultVendorItemPrice();
          this.initItemProtection();
+         this.initUIChanges();
          CategoryWeight.init(this._parent);
          LegendaryMods.init();
          stage.addEventListener(KeyboardEvent.KEY_UP,this.keyUpHandler);
@@ -594,6 +595,26 @@ package
          {
             Logger.get().error("Error initDefaultVendorItemPrice: " + e);
             ShowHUDMessage("Error initDefaultVendorItemPrice: " + e,true);
+         }
+      }
+      
+      private function initUIChanges() : void
+      {
+         try
+         {
+            if(getQualifiedClassName(this._parent.getChildAt(0)) == "flash.display::MovieClip" && Boolean(config.hideVignette))
+            {
+               this._parent.getChildAt(0).visible = false;
+            }
+            if(Boolean(config.hideHeader))
+            {
+               this._parent.Header_mc.visible = false;
+            }
+         }
+         catch(e:Error)
+         {
+            Logger.get().error("Error initUIChanges: " + e);
+            ShowHUDMessage("Error initUIChanges: " + e,true);
          }
       }
       
