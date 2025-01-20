@@ -40,6 +40,13 @@ package utils
          {
             return false;
          }
+         if(config.containerName != null && config.disableForContainers != null && config.disableForContainers is Array)
+         {
+            if(config.disableForContainers.indexOf(config.containerName) != -1)
+            {
+               return false;
+            }
+         }
          if(itemProtection[item.serverHandleId] != null)
          {
             return itemProtection[item.serverHandleId];

@@ -62,6 +62,8 @@ package
       
       private var modHeaders:*;
       
+      private var offerHeader:String = "";
+      
       public function InventOmaticStash()
       {
          this.modHeaders = {};
@@ -173,6 +175,10 @@ package
                return false;
             }
             t1 = getTimer();
+            if(this.config.protectionConfig.transferProtection && offerHeader != "")
+            {
+               this.config.protectionConfig.transferProtection.containerName = offerHeader;
+            }
             if(this.parentClip.MenuMode == SecureTradeShared.MODE_NPCVENDING)
             {
                if(ItemProtection.isProtected(item,this.config.protectionConfig.saleProtection))
@@ -811,6 +817,11 @@ package
          var stashInvFilter:int;
          try
          {
+            if(offerHeader == "")
+            {
+               offerHeader = this.parentClip.OfferInventory_mc.Header_mc.Header_tf.text.toUpperCase();
+               Logger.get().info("Offer header: " + offerHeader);
+            }
             if(!config || !config.showCategoryItemCount)
             {
                return;

@@ -156,6 +156,16 @@ package
             setName(config.buyConfig,TITLE_BUY);
             setMaxItems(config.buyConfig);
          }
+         if(config.protectionConfig)
+         {
+            if(config.protectionConfig.transferProtection && config.protectionConfig.transferProtection.disableForContainers)
+            {
+               for(c in config.protectionConfig.transferProtection.disableForContainers)
+               {
+                  config.protectionConfig.transferProtection.disableForContainers[c] = config.protectionConfig.transferProtection.disableForContainers[c].toUpperCase();
+               }
+            }
+         }
          config.categoryWeightConfig = loadCategoryWeightConfig(config.categoryWeightConfig);
          config.itemNamesGroupConfig = loadItemNamesGroupConfig(config.itemNamesGroupConfig);
          initHotkeys(config);
