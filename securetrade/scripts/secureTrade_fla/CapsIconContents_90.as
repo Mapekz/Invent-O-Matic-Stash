@@ -2,12 +2,12 @@ package secureTrade_fla
 {
    import flash.display.MovieClip;
    
-   [Embed(source="/_assets/assets.swf", symbol="symbol55")]
-   public dynamic class SetBonusIcon_111 extends MovieClip
+   [Embed(source="/_assets/assets.swf", symbol="symbol208")]
+   public dynamic class CapsIconContents_90 extends MovieClip
    {
        
       
-      public function SetBonusIcon_111()
+      public function CapsIconContents_90()
       {
          super();
          addFrameScript(0,this.frame1,1,this.frame2);

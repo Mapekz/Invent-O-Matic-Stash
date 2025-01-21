@@ -2,14 +2,12 @@ package secureTrade_fla
 {
    import flash.display.MovieClip;
    
-   [Embed(source="/_assets/assets.swf", symbol="symbol165")]
-   public dynamic class colorConditionMeter_99 extends MovieClip
+   [Embed(source="/_assets/assets.swf", symbol="symbol248")]
+   public dynamic class icon_durability_76 extends MovieClip
    {
        
       
-      public var MeterClip_mc:MovieClip;
-      
-      public function colorConditionMeter_99()
+      public function icon_durability_76()
       {
          super();
          addFrameScript(0,this.frame1);

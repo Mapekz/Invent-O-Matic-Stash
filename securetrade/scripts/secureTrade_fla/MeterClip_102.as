@@ -3,11 +3,11 @@ package secureTrade_fla
    import flash.display.MovieClip;
    
    [Embed(source="/_assets/assets.swf", symbol="symbol65")]
-   public dynamic class MeterClip_100 extends MovieClip
+   public dynamic class MeterClip_102 extends MovieClip
    {
        
       
-      public function MeterClip_100()
+      public function MeterClip_102()
       {
          super();
          addFrameScript(0,this.frame1);

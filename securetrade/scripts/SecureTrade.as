@@ -36,7 +36,7 @@ package
    import scaleform.gfx.Extensions;
    import scaleform.gfx.TextFieldEx;
    
-   [Embed(source="/_assets/assets.swf", symbol="symbol387")]
+   [Embed(source="/_assets/assets.swf", symbol="symbol362")]
    public class SecureTrade extends IMenu
    {
       
@@ -280,6 +280,16 @@ package
       private const DEFAULT_CATEGORY_BAR_SCALE:* = 1.1;
       
       private const CORPSE_LOOT_CATEGORY_BAR_SCALE:* = 1.15;
+      
+      private const ITEM_CARD_START_HEIGHT:Number = 82;
+      
+      private const ITEM_CARD_START_Y:Number = 338.8;
+      
+      private const ITEM_CARD_ENTRY_HEIGHT:Number = 40;
+      
+      private const ITEM_CARD_LABEL_START_Y:Number = 340.7;
+      
+      private const ITEM_CARD_DESCRIPTION_START_Y:Number = 240.05;
       
       private var maintainScrollPosition:Boolean = false;
       
@@ -1327,7 +1337,7 @@ package
       {
          if(this.ModalSetQuantity_mc.opened)
          {
-            this.ModalSetQuantity_mc.quantityInput(this.calcMaxQuantity());
+            this.ModalSetQuantity_mc.quantityInput(this.calcMaxQuantity(true));
          }
       }
       
@@ -1383,7 +1393,7 @@ package
       
       private function DelayForItemProcessing() : void
       {
-         updateButtonHints();
+         this.updateButtonHints();
       }
       
       private function onQuantityCancel(param1:Event) : *
@@ -1428,6 +1438,7 @@ package
       {
          var _loc4_:Array = null;
          var _loc5_:uint = 0;
+         var _loc6_:uint = 0;
          var _loc3_:Boolean = false;
          if(this.selectedListEntry != null)
          {
@@ -1483,7 +1494,12 @@ package
             this.ItemCardContainer_mc.ItemCard_mc.InfoObj = _loc4_;
             this.ItemCardContainer_mc.ItemCard_mc.redrawUIComponent();
             this.ItemCardContainer_mc.Background_mc.visible = true;
-            this.ItemCardContainer_mc.Background_mc.gotoAndStop("entry" + this.ItemCardContainer_mc.ItemCard_mc.entryCount);
+            _loc6_ = this.ItemCardContainer_mc.ItemCard_mc.entryCount - 1;
+            this.ItemCardContainer_mc.Background_mc.Box_mc.height = this.ITEM_CARD_START_HEIGHT + this.ITEM_CARD_ENTRY_HEIGHT * _loc6_;
+            this.ItemCardContainer_mc.Background_mc.Box_mc.y = this.ITEM_CARD_START_Y - this.ITEM_CARD_ENTRY_HEIGHT * _loc6_;
+            this.ItemCardContainer_mc.Background_mc.itemStatsLabel_tf.y = this.ITEM_CARD_LABEL_START_Y - (this.ITEM_CARD_ENTRY_HEIGHT - 1) * _loc6_;
+            this.ItemCardContainer_mc.Background_mc.StatsLabelBG_mc.y = this.ITEM_CARD_LABEL_START_Y - (this.ITEM_CARD_ENTRY_HEIGHT - 1) * _loc6_;
+            this.ItemCardContainer_mc.Background_mc.Description_mc.y = this.ITEM_CARD_DESCRIPTION_START_Y - this.ITEM_CARD_ENTRY_HEIGHT * _loc6_;
          }
          else
          {
@@ -1870,6 +1886,7 @@ package
                         if(_selectedEntry.isOffered == true)
                         {
                            this.SetSelectedItemValues(_selectedEntry);
+                           this.ModalSetQuantity_mc.ShowMaxQuantityButton(true);
                            this.openQuantityModal(this.openConfirmPurchaseModal);
                         }
                         else if(_selectedEntry.isRequested)
@@ -2014,6 +2031,7 @@ package
                   {
                      break;
                   }
+                  this.ModalSetQuantity_mc.ShowMaxQuantityButton(true);
                   if(this.m_OwnsVendor)
                   {
                      if(this.m_SelectedList == this.OfferInventory_mc)
@@ -2442,39 +2460,42 @@ package
          this.disableInput = false;
       }
       
-      private function calcMaxQuantity() : uint
+      private function calcMaxQuantity(param1:Boolean = false) : uint
       {
          var i:int = 0;
          var itemValue:Number = Number(this.ItemCardContainer_mc.ItemCard_mc.getChildAt(0).Value_tf.text);
-         var offerCurrency:Number = this.OfferInventory_mc.currency;
-         var playerCurrency:Number = this.PlayerInventory_mc.currency;
+         var offerCurrency:Number = Number(this.OfferInventory_mc.OfferCurrency_tf.text);
+         var playerCurrency:Number = Number(this.PlayerInventory_mc.PlayerCurrency_tf.text);
          var currency:Number = this.selectedList == this.PlayerInventory_mc ? offerCurrency : playerCurrency;
-         var maxQuantity:Number = 0;
-         if(!this.m_OwnsVendor && (this.m_MenuMode == MODE_NPCVENDING || this.m_MenuMode == MODE_VENDING_MACHINE))
+         var maxQuantity:Number = !!this.selectedListEntry ? Number(this.selectedListEntry.count) : 1;
+         if(param1)
          {
-            if(isNaN(itemValue))
+            if(!this.m_OwnsVendor && this.m_MenuMode == MODE_PLAYERVENDING && Boolean(this.selectedListEntry.isOffered))
             {
-               itemValue = 1;
-               i = 0;
-               while(i < this.ItemCardContainer_mc.ItemCard_mc.InfoObj.length)
-               {
-                  if(this.ItemCardContainer_mc.ItemCard_mc.InfoObj[i].text == "$val")
-                  {
-                     itemValue = Number(this.ItemCardContainer_mc.ItemCard_mc.InfoObj[i].value);
-                     break;
-                  }
-                  i++;
-               }
+               maxQuantity = Math.min(this.selectedListEntry.count,Math.floor(currency / this.selectedListEntry.offerValue));
             }
-            maxQuantity = Math.min(this.selectedListEntry.count,Math.floor(currency / itemValue));
-            if(this.selectedList == this.PlayerInventory_mc && this.isMaxCurrencyProtection())
+            else if(!this.m_OwnsVendor && (this.m_MenuMode == MODE_NPCVENDING || this.m_MenuMode == MODE_VENDING_MACHINE))
             {
-               maxQuantity = Math.min(Math.floor((this.PlayerInventory_mc.currencyMax - playerCurrency) / itemValue),maxQuantity);
+               if(isNaN(itemValue))
+               {
+                  itemValue = 1;
+                  i = 0;
+                  while(i < this.ItemCardContainer_mc.ItemCard_mc.InfoObj.length)
+                  {
+                     if(this.ItemCardContainer_mc.ItemCard_mc.InfoObj[i].text == "$val")
+                     {
+                        itemValue = Number(this.ItemCardContainer_mc.ItemCard_mc.InfoObj[i].value);
+                        break;
+                     }
+                     i++;
+                  }
+               }
+               maxQuantity = Math.min(this.selectedListEntry.count,Math.floor(currency / itemValue));
             }
          }
-         else
+         if(maxQuantity < 1)
          {
-            maxQuantity = Number(this.selectedListEntry.count);
+            maxQuantity = 1;
          }
          return maxQuantity;
       }
@@ -2482,6 +2503,7 @@ package
       private function openQuantityModal(param1:Function, param2:Function = null) : void
       {
          var _loc4_:uint = 0;
+         var _loc5_:uint = 0;
          var _loc3_:int = int(this.selectedListEntry.count);
          this._OnQuantityConfirmedFn = param1;
          this._OnSetPriceConfirmedFn = param2;
@@ -2494,7 +2516,8 @@ package
          {
             this.ModalSetQuantity_mc.tooltip = "";
             _loc4_ = this.calcMaxQuantity();
-            this.ModalSetQuantity_mc.OpenMenuRange(stage.focus,"$SETQUANTITY",1,_loc4_,_loc4_,0);
+            _loc5_ = this.calcMaxQuantity(this._OnSetPriceConfirmedFn == null);
+            this.ModalSetQuantity_mc.OpenMenuRange(stage.focus,"$SETQUANTITY",1,_loc4_,_loc5_,0);
             stage.focus = this.ModalSetQuantity_mc;
             GlobalFunc.PlayMenuSound(GlobalFunc.MENU_SOUND_POPUP);
             this.updateModalActive();

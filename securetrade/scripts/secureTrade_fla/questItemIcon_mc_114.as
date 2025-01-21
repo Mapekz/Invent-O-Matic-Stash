@@ -2,12 +2,12 @@ package secureTrade_fla
 {
    import flash.display.MovieClip;
    
-   [Embed(source="/_assets/assets.swf", symbol="symbol248")]
-   public dynamic class icon_durability_74 extends MovieClip
+   [Embed(source="/_assets/assets.swf", symbol="symbol58")]
+   public dynamic class questItemIcon_mc_114 extends MovieClip
    {
        
       
-      public function icon_durability_74()
+      public function questItemIcon_mc_114()
       {
          super();
          addFrameScript(0,this.frame1);
