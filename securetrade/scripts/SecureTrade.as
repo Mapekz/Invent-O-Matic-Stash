@@ -2464,8 +2464,8 @@ package
       {
          var i:int = 0;
          var itemValue:Number = Number(this.ItemCardContainer_mc.ItemCard_mc.getChildAt(0).Value_tf.text);
-         var offerCurrency:Number = Number(this.OfferInventory_mc.OfferCurrency_tf.text);
-         var playerCurrency:Number = Number(this.PlayerInventory_mc.PlayerCurrency_tf.text);
+         var offerCurrency:Number = this.OfferInventory_mc.currency;
+         var playerCurrency:Number = this.PlayerInventory_mc.currency;
          var currency:Number = this.selectedList == this.PlayerInventory_mc ? offerCurrency : playerCurrency;
          var maxQuantity:Number = !!this.selectedListEntry ? Number(this.selectedListEntry.count) : 1;
          if(param1)
@@ -2491,6 +2491,10 @@ package
                   }
                }
                maxQuantity = Math.min(this.selectedListEntry.count,Math.floor(currency / itemValue));
+               if(this.selectedList == this.PlayerInventory_mc && this.isMaxCurrencyProtection())
+               {
+                  return Math.min(Math.floor((this.PlayerInventory_mc.currencyMax - playerCurrency) / itemValue),maxQuantity);
+               }
             }
          }
          if(maxQuantity < 1)
