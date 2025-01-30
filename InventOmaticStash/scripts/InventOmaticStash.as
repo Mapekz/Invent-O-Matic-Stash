@@ -1,10 +1,8 @@
 package
 {
-   import Shared.AS3.BSButtonHintBar;
-   import Shared.AS3.BSButtonHintData;
-   import Shared.AS3.Data.BSUIDataManager;
+   import Shared.AS3.*;
+   import Shared.AS3.Data.*;
    import Shared.AS3.Events.*;
-   import Shared.AS3.SecureTradeShared;
    import Shared.GlobalFunc;
    import com.adobe.serialization.json.JSONDecoder;
    import com.adobe.serialization.json.JSONEncoder;
@@ -236,24 +234,30 @@ package
       private function loadConfig() : void
       {
          var loaderComplete:Function;
+         var t1:*;
+         var t2:*;
+         var t3:*;
          var url:URLRequest = null;
          var loader:URLLoader = null;
          try
          {
+            t1 = getTimer();
             loaderComplete = function(param1:Event):void
             {
                var _loc2_:Object;
                try
                {
                   _loc2_ = new JSONDecoder(loader.data,true).getValue();
+                  t2 = getTimer();
                   Logger.get().debugMode = _loc2_.debug;
                   InventOmaticConfig.init(_loc2_);
                   init();
+                  t3 = getTimer();
                   if(!config.hideLoadMessage)
                   {
                      ShowHUDMessage("Config file is loaded!");
                   }
-                  Logger.get().info("Config file is loaded! v" + Version.VERSION);
+                  Logger.get().info("Config file is loaded! v" + Version.VERSION + " (" + (t2 - t1) + "ms/init:" + (t3 - t2) + "ms)");
                }
                catch(e:Error)
                {
