@@ -447,6 +447,8 @@ package
       {
          this.m_MenuMode = 4294967295;
          this.m_CurrencyType = 4294967295;
+         this.m_MenuMode = 4294967295;
+         this.m_CurrencyType = 4294967295;
          this.__SFCodeObj = new Object();
          this.ButtonPlayerInventory = new BSButtonHintData("$TransferPlayerLabel","LT","PSN_L2_Alt","Xenon_L2_Alt",1,this.onSwapInventoryPlayer);
          this.ButtonContainerInventory = new BSButtonHintData("$TransferContainerLabel","RT","PSN_R2_Alt","Xenon_R2_Alt",1,this.onSwapInventoryContainer);
@@ -3227,7 +3229,7 @@ package
          }
       }
       
-      private function onSwapInventoryPlayer() : void
+      public function onSwapInventoryPlayer() : void
       {
          this.selectedList = this.PlayerInventory_mc as SecureTradeInventory;
          if(uiController != PlatformChangeEvent.PLATFORM_PC_KB_MOUSE && this.selectedList.ItemList_mc.List_mc.selectedIndex == -1)
@@ -3237,7 +3239,7 @@ package
          this.updateButtonHints();
       }
       
-      private function onSwapInventoryContainer() : void
+      public function onSwapInventoryContainer() : void
       {
          this.selectedList = this.OfferInventory_mc as SecureTradeInventory;
          if(uiController != PlatformChangeEvent.PLATFORM_PC_KB_MOUSE && this.selectedList.ItemList_mc.List_mc.selectedIndex == -1)
