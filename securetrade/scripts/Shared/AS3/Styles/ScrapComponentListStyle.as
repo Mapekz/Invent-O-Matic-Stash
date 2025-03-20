@@ -7,7 +7,7 @@ package Shared.AS3.Styles
       
       public static var listEntryClass_Inspectable:String = "ScrapComponentListEntry";
       
-      public static var numListItems_Inspectable:uint = 9;
+      public static var numListItems_Inspectable:uint = 7;
       
       public static var textOption_Inspectable:String = BSScrollingList.TEXT_OPTION_SHRINK_TO_FIT;
       
