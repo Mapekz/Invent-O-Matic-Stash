@@ -11,6 +11,8 @@ package utils
       
       private static const MAX_CURRENCY:String = "Max Currency";
       
+      private static const KNOWN_LEGENDARY_MOD:String = "Known Legendary Mod";
+      
       private static var _protectionReason:String = "";
       
       private static var secureTrade:Object;
@@ -49,18 +51,17 @@ package utils
          }
          if(itemProtection[item.serverHandleId] != null)
          {
+            _protectionReason = itemProtection[item.serverHandleId];
             return itemProtection[item.serverHandleId];
          }
          if(config.equipped && item.equipState == 1)
          {
             _protectionReason = EQUIPPED;
-            itemProtection[item.serverHandleId] = true;
             return true;
          }
          if(config.favorite && item.favorite)
          {
             _protectionReason = FAVORITE;
-            itemProtection[item.serverHandleId] = true;
             return true;
          }
          if(config.named && config.itemNames && config.itemNames.length > 0 && config.matchMode)
@@ -82,7 +83,7 @@ package utils
                if(ItemWorker.isMatchingString(item.text,itemNames[i],config.matchMode))
                {
                   _protectionReason = NAMED;
-                  itemProtection[item.serverHandleId] = true;
+                  itemProtection[item.serverHandleId] = NAMED;
                   return true;
                }
                i++;
@@ -91,6 +92,12 @@ package utils
          if(config.maxCurrency && item.itemValue + secureTrade.PlayerInventory_mc.currency > secureTrade.PlayerInventory_mc.currencyMax)
          {
             _protectionReason = MAX_CURRENCY;
+            return true;
+         }
+         if(config.knownLegendaryMods && LegendaryMods.isKnownModName(item.text))
+         {
+            _protectionReason = KNOWN_LEGENDARY_MOD;
+            itemProtection[item.serverHandleId] = KNOWN_LEGENDARY_MOD;
             return true;
          }
          return false;

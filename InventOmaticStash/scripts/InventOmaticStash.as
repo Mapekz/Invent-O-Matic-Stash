@@ -1064,13 +1064,6 @@ package
          {
             this.scrapItemsCallback();
          }
-         if(param1.keyCode == InventOmaticConfig.LootKeyCode)
-         {
-            if(this.config.lootConfig && this.config.lootConfig.enabled)
-            {
-               this.lootItemsCallback();
-            }
-         }
          if(param1.keyCode == InventOmaticConfig.NpcSellKeyCode)
          {
             if(this.config.npcSellConfig && this.config.npcSellConfig.enabled)
@@ -1101,6 +1094,13 @@ package
                break;
             }
             indexConfig++;
+         }
+         if(param1.keyCode == InventOmaticConfig.LootKeyCode)
+         {
+            if(this.config.lootConfig && this.config.lootConfig.enabled)
+            {
+               this.lootItemsCallback();
+            }
          }
          if(param1.keyCode == InventOmaticConfig.ExtractKeyCode)
          {

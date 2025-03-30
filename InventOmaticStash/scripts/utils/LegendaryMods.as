@@ -22,6 +22,8 @@ package utils
       
       private static var _legendaryModsByDesc:* = null;
       
+      private static var _legendaryModsByName:* = null;
+      
       private static var _legendaryModNamesByDesc:* = null;
       
       private static var _characterName:String;
@@ -176,10 +178,12 @@ package utils
          loadExistingItemsmodIni(function(legendaryModsList:*):*
          {
             var legendaryModsByDesc:* = {};
+            var legendaryModsByName:* = {};
             var i:* = 0;
             while(i < legendaryModsList.length)
             {
                var currentMod:* = legendaryModsList[i];
+               legendaryModsByName[currentMod.fullName] = currentMod.isLearned;
                stats[currentMod.stars - 1][1]++;
                if(!currentMod.isLearned)
                {
@@ -255,6 +259,7 @@ package utils
                }
                i++;
             }
+            _legendaryModsByName = legendaryModsByName;
             _legendaryModsByDesc = legendaryModsByDesc;
             if(config.legendaryModsConfig.debug)
             {
@@ -340,6 +345,15 @@ package utils
             i++;
          }
          return null;
+      }
+      
+      public static function isKnownModName(text:String) : Boolean
+      {
+         if(_hasInitializedLearnableLegendaryMods && _legendaryModsByName != null)
+         {
+            return Boolean(_legendaryModsByName[text]);
+         }
+         return false;
       }
       
       public static function getLegendaryItemDescription(desc:String) : *
