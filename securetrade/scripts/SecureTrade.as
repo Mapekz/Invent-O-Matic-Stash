@@ -447,6 +447,8 @@ package
       {
          this.m_MenuMode = 4294967295;
          this.m_CurrencyType = 4294967295;
+         this.m_MenuMode = 4294967295;
+         this.m_CurrencyType = 4294967295;
          this.__SFCodeObj = new Object();
          this.ButtonPlayerInventory = new BSButtonHintData("$TransferPlayerLabel","LT","PSN_L2_Alt","Xenon_L2_Alt",1,this.onSwapInventoryPlayer);
          this.ButtonContainerInventory = new BSButtonHintData("$TransferContainerLabel","RT","PSN_R2_Alt","Xenon_R2_Alt",1,this.onSwapInventoryContainer);
