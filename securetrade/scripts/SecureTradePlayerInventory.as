@@ -181,7 +181,14 @@ package
          }
          if(this.PlayerCurrency_tf)
          {
-            this.PlayerCurrency_tf.text = this.m_Currency + "/" + this.m_CurrencyMax;
+            if(CurrencyLimitIndicator)
+            {
+               this.PlayerCurrency_tf.text = this.m_Currency + "/" + this.m_CurrencyMax;
+            }
+            else
+            {
+               this.PlayerCurrency_tf.text = this.m_Currency.toString();
+            }
          }
       }
    }
