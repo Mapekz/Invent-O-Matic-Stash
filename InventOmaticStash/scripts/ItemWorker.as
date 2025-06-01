@@ -1,6 +1,7 @@
 package
 {
    import Shared.AS3.SecureTradeShared;
+   import Shared.GlobalFunc;
    import com.adobe.serialization.json.JSONEncoder;
    import extractors.GameApiDataExtractor;
    import flash.utils.setTimeout;
@@ -482,7 +483,7 @@ package
             delay = Parser.parsePositiveNumber(config.delay);
             repeat = Parser.parsePositiveNumber(config.repeat,1);
             ReturnDelay = delay * repeat * _queue.length;
-            executeForQueue(transferQueued,delay,repeat,config.debug,"Transferring selected");
+            executeForQueue(transferQueued,delay,repeat,config.debug,config.showMessage,"Transferring selected");
          }
          catch(e:Error)
          {
@@ -730,7 +731,7 @@ package
                delay = Parser.parsePositiveNumber(config.delay);
                repeat = Parser.parsePositiveNumber(config.repeat,1);
                ReturnDelay = delay * repeat * _queue.length;
-               executeForQueue(transferQueued,delay,repeat,config.debug,"Transferring");
+               executeForQueue(transferQueued,delay,repeat,config.debug,config.showMessage,"Transferring");
             }
             catch(e:Error)
             {
@@ -861,7 +862,7 @@ package
                }
                delay = Parser.parsePositiveNumber(config.delay);
                repeat = Parser.parsePositiveNumber(config.repeat,1);
-               executeForQueue(scrapQueued,delay,repeat,config.debug,"Scrapping");
+               executeForQueue(scrapQueued,delay,repeat,config.debug,config.showMessage,"Scrapping");
             }
          }
          catch(e:Error)
@@ -1030,7 +1031,7 @@ package
                }
                delay = Parser.parsePositiveNumber(config.delay);
                repeat = Parser.parsePositiveNumber(config.repeat,1);
-               executeForQueue(sellQueued,delay,repeat,config.debug,"Selling");
+               executeForQueue(sellQueued,delay,repeat,config.debug,config.showMessage,"Selling");
             }
          }
          catch(e:Error)
@@ -1523,7 +1524,7 @@ package
                }
                delay = isNpcVendor ? Parser.parsePositiveNumber(config.delayNpcVendor) : Parser.parsePositiveNumber(config.delayCampVendor,1500);
                repeat = Parser.parsePositiveNumber(config.repeat,1);
-               executeForQueue(buyQueued,delay,repeat,config.debug,"Buying");
+               executeForQueue(buyQueued,delay,repeat,config.debug,config.showMessage,"Buying");
             }
          }
          catch(e:Error)
@@ -1532,7 +1533,7 @@ package
          }
       }
       
-      private function executeForQueue(func:Function, delay:uint, repeat:uint, debug:Boolean, actionName:String = "Exec") : void
+      private function executeForQueue(func:Function, delay:uint, repeat:uint, debug:Boolean, showMessage:*, actionName:String = "Exec") : void
       {
          var i:int;
          var loop:int;
@@ -1542,6 +1543,20 @@ package
          if(debug)
          {
             Logger.get().info(actionName + " " + _queue.length + " queued item(s) with delay: " + delay + "ms, repeat: " + repeat + " time(s)");
+         }
+         if(showMessage)
+         {
+            if(showMessage == "FULL")
+            {
+               GlobalFunc.ShowHUDMessage("[" + InventOmaticStash.FULL_MOD_NAME + "] " + actionName + " " + _queue.length + " items: " + _queue.map(function(x:Object):String
+               {
+                  return x.text + (x.count > 1 ? " (" + x.count + ")" : "");
+               }).join(", "));
+            }
+            else
+            {
+               GlobalFunc.ShowHUDMessage("[" + InventOmaticStash.FULL_MOD_NAME + "] " + actionName + " " + _queue.length + " items");
+            }
          }
          i = 0;
          loop = 0;

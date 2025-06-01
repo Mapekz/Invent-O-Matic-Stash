@@ -18,6 +18,8 @@ package
    
    public class InventOmaticStash extends MovieClip
    {
+      
+      public static const FULL_MOD_NAME:String = "IOMS " + Version.VERSION;
        
       
       private const DEFAULT_SHOW_BUTTON_STATE:Boolean = InventOmaticConfig.DEFAULT_SHOW_BUTTON_STATE;
@@ -94,7 +96,7 @@ package
       {
          if(Logger.DEBUG_MODE || param2)
          {
-            GlobalFunc.ShowHUDMessage("[IOMS-uo v" + Version.LOADER + "] " + param1);
+            GlobalFunc.ShowHUDMessage("[" + FULL_MOD_NAME + "] " + param1);
          }
       }
       
@@ -416,6 +418,7 @@ package
          this.initScrollPosition();
          this.initHideTakeAll();
          this.initDefaultVendorItemPrice();
+         this.initDefaultSelectedTab();
          this.initItemProtection();
          this.initUIChanges();
          CategoryWeight.init(this._parent);
@@ -629,6 +632,46 @@ package
          {
             Logger.get().error("Error initDefaultVendorItemPrice: " + e);
             ShowHUDMessage("Error initDefaultVendorItemPrice: " + e,true);
+         }
+      }
+      
+      private function initDefaultSelectedTab() : void
+      {
+         var tabName:*;
+         try
+         {
+            tabName = config.defaultSelectedTab;
+            if(tabName != null && tabName is String && tabName.length > 0)
+            {
+               setTimeout(function():void
+               {
+                  if(ItemTypes.ITEM_TYPES[tabName] != null)
+                  {
+                     var selectedID:uint = uint(ItemTypes.ITEM_TYPES[tabName][0]);
+                  }
+                  else if(tabName == "INVENTORY")
+                  {
+                     selectedID = uint.MAX_VALUE;
+                  }
+                  else
+                  {
+                     if(tabName != "FAVORITES")
+                     {
+                        return;
+                     }
+                     selectedID = 1;
+                  }
+                  var selectedTab:uint = uint(_parent.CategoryBar_mc.GetLabelIndex(selectedID));
+                  _parent.selectedTab = selectedTab;
+                  _parent.CategoryBar_mc.SelectedID = selectedID;
+                  Logger.get().info("defaultSelectedTab set to " + tabName);
+               },500);
+            }
+         }
+         catch(e:Error)
+         {
+            Logger.get().error("Error initDefaultSelectedTab: " + e);
+            ShowHUDMessage("Error initDefaultSelectedTab: " + e,true);
          }
       }
       
