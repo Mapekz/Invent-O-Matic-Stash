@@ -754,6 +754,42 @@ package
          return newMatches;
       }
       
+      private function isItemMatchingArmorGradeConfig(item:Object, config:Object) : Boolean
+      {
+         var itemCard:Object;
+         var i:int;
+         var armorGrade:String;
+         try
+         {
+            if(!config.checkArmorGrade || !(item.filterFlag & 8))
+            {
+               return true;
+            }
+            itemCard = ItemCardData.get(item.serverHandleID);
+            if(itemCard == null)
+            {
+               return false;
+            }
+            armorGrade = ArmorGrade.lookupArmorGrade(item);
+            Logger.get().info(item.text + " grade: " + armorGrade);
+            if(false)
+            {
+               switch(config.legendaryEffectsMatchMode)
+               {
+                  case MatchMode.EXACT:
+                  case MatchMode.CONTAINS:
+                  case MatchMode.NOT_CONTAINS:
+               }
+               Logger.get().error("Invalid legendary match mode: " + config.legendaryEffectsMatchMode);
+            }
+         }
+         catch(e:*)
+         {
+            Logger.get().errorHandler("Error checking armor grade for " + item.text + ", " + errorCode,e);
+         }
+         return false;
+      }
+      
       private function isItemMatchingLegendaryConfig(item:Object, config:Object) : Boolean
       {
          var desc:String;

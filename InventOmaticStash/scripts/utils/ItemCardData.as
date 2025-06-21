@@ -25,6 +25,40 @@ package utils
          return itemCardEntries[serverHandleId];
       }
       
+      public static function findItemCardValue(itemCards:Array, text:String) : Object
+      {
+         if(itemCards != null && itemCards.length > 0)
+         {
+            var i:int = 0;
+            while(i < itemCards.length)
+            {
+               if(itemCards[i].text == text)
+               {
+                  return itemCards[i].value;
+               }
+               i++;
+            }
+         }
+         return "";
+      }
+      
+      public static function findResistanceValue(itemCards:Array, damageType:int) : int
+      {
+         if(itemCards != null && itemCards.length > 0)
+         {
+            var i:int = 0;
+            while(i < itemCards.length)
+            {
+               if(itemCards[i].text == "$dr" && itemCards[i].damageType == damageType)
+               {
+                  return int(itemCards[i].value);
+               }
+               i++;
+            }
+         }
+         return "";
+      }
+      
       private static function onInventoryItemCardDataUpdate(e:FromClientDataEvent) : void
       {
          var data:Object = e.data;
