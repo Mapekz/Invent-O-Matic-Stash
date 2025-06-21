@@ -6,6 +6,7 @@ package
    import extractors.GameApiDataExtractor;
    import flash.utils.setTimeout;
    import utils.ItemCardData;
+   import utils.LegendaryMods;
    import utils.Logger;
    import utils.Parser;
    
@@ -415,6 +416,23 @@ package
          return InventOmaticConfig.get();
       }
       
+      private static function findItemCardValue(itemCards:Array, text:String) : Object
+      {
+         if(itemCards != null && itemCards.length > 0)
+         {
+            var i:int = 0;
+            while(i < itemCards.length)
+            {
+               if(itemCards[i].text == text)
+               {
+                  return itemCards[i].value;
+               }
+               i++;
+            }
+         }
+         return "";
+      }
+      
       private function get _queueValid() : Boolean
       {
          return _queue && _queueIndex < _queue.length && _queue[_queueIndex];
@@ -693,7 +711,11 @@ package
             }
             else
             {
-               if(item.isLegendary && sectionConfig.transferLegendaries.indexOf(item.numLegendaryStars) != -1 || transferTaggedForSearch && item.taggedForSearch)
+               if(transferTaggedForSearch && item.taggedForSearch)
+               {
+                  newMatches[0][0].push(item);
+               }
+               else if(item.isLegendary && sectionConfig.transferLegendaries.indexOf(item.numLegendaryStars) != -1)
                {
                   newMatches[0][0].push(item);
                }
@@ -720,7 +742,7 @@ package
                else
                {
                   errorCode = "loopInv mipn " + index;
-                  isMatching = isItemMatchingTransferConfig(item,sectionConfig);
+                  isMatching = isItemMatchingTransferConfig(item,sectionConfig) && isItemMatchingLegendaryConfig(item,sectionConfig);
                   if(isMatching)
                   {
                      newMatches[0][0].push(item);
@@ -730,6 +752,100 @@ package
             }
          }
          return newMatches;
+      }
+      
+      private function isItemMatchingLegendaryConfig(item:Object, config:Object) : Boolean
+      {
+         var desc:String;
+         var legMod:String;
+         var legMods:Array;
+         var itemCard:Object;
+         var i:int;
+         if(!config.checkLegendaryEffects)
+         {
+            return true;
+         }
+         if(!item.isLegendary)
+         {
+            return false;
+         }
+         desc = "";
+         legMod = "";
+         legMods = [];
+         itemCard = ItemCardData.get(item.serverHandleID);
+         if(itemCard == null)
+         {
+            return false;
+         }
+         desc = findItemCardValue(itemCard.itemCardEntries,"DESC");
+         if(desc.length > 0)
+         {
+            switch(config.legendaryEffectsMatchMode)
+            {
+               case MatchMode.EXACT:
+                  i = 1;
+                  while(i <= item.numLegendaryStars)
+                  {
+                     legMod = LegendaryMods.getLegendaryModName(desc,i);
+                     legMods.push(legMod);
+                     if(legMod == null)
+                     {
+                        Logger.get().info(item.text + " DOES NOT MATCH, effect not found on slot: " + i);
+                        return false;
+                     }
+                     if(!config.legendaryEffects.some(function(element:*, index:int, arr:Array):Boolean
+                     {
+                        return legMod.indexOf(element) != -1;
+                     }))
+                     {
+                        Logger.get().info(item.text + " DOES NOT MATCH, contains: " + legMod);
+                        return false;
+                     }
+                     i++;
+                  }
+                  Logger.get().info(item.text + " MATCHES, effects: " + legMods.join("/"));
+                  return true;
+               case MatchMode.CONTAINS:
+                  i = 1;
+                  while(i <= item.numLegendaryStars)
+                  {
+                     legMod = LegendaryMods.getLegendaryModName(desc,i);
+                     legMods.push(legMod);
+                     if(legMod != null && config.legendaryEffects.some(function(element:*, index:int, arr:Array):Boolean
+                     {
+                        return legMod.indexOf(element) != -1;
+                     }))
+                     {
+                        Logger.get().info(item.text + " MATCHES, contains: " + legMod);
+                        return true;
+                     }
+                     i++;
+                  }
+                  Logger.get().info(item.text + " DOES NOT MATCH, effects: " + legMods.join("/"));
+                  return false;
+               case MatchMode.NOT_CONTAINS:
+                  i = 1;
+                  while(i <= item.numLegendaryStars)
+                  {
+                     legMod = LegendaryMods.getLegendaryModName(desc,i);
+                     legMods.push(legMod);
+                     if(legMod != null && config.legendaryEffects.some(function(element:*, index:int, arr:Array):Boolean
+                     {
+                        return legMod.indexOf(element) != -1;
+                     }))
+                     {
+                        Logger.get().info(item.text + " DOES NOT MATCH, contains: " + legMod);
+                        return false;
+                     }
+                     i++;
+                  }
+                  Logger.get().info(item.text + " MATCHES, effects: " + legMods.join("/"));
+                  return true;
+               default:
+                  Logger.get().error("Invalid legendary match mode: " + config.legendaryEffectsMatchMode);
+            }
+         }
+         return false;
       }
       
       private function transfer(param1:Array, param2:Boolean, param3:Object) : uint
@@ -1565,10 +1681,6 @@ package
                validConfigs.push(config);
             }
             indexConfig++;
-         }
-         if(checkLegendaryEffects)
-         {
-            return;
          }
          indexConfig = 0;
          execNext = function():void
