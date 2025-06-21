@@ -1577,7 +1577,7 @@ package
             Logger.get().info("inv " + inventory.length);
             delay = initDelay;
             Logger.get().info("delay " + delay);
-            delayStep = Parser.parsePositiveNumber(config.itemCardEntryDelayStep,150);
+            delayStep = Parser.parsePositiveNumber(config.delayItemCardStep,150);
             Logger.get().info("delayStep " + delayStep);
             i = 0;
             while(i < inventory.length)
