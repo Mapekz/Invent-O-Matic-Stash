@@ -112,7 +112,7 @@ package
          return false;
       }
       
-      private static function isMatchingItemName(param1:String, config:Object, isAltItem:Boolean = false) : Boolean
+      private static function isMatchingItemName(param1:String, config:Object) : Boolean
       {
          var stringToCompare:String = null;
          var isMatching:Boolean = false;
@@ -134,18 +134,61 @@ package
          i = 0;
          while(i < itemNames.length)
          {
-            if(isAltItem)
+            stringToCompare = String(itemNames[i]);
+            isMatching = isMatchingString(itemName,stringToCompare,matchMode);
+            if(INVERSE)
             {
-               if(!config.altItemNames || config.altItemNames.length < i || config.altItemNames[i] == null || config.altItemNames[i].length == 0 || config.altItemNames[i] == "")
+               if(!isMatching)
                {
+                  allMatch = false;
                   return false;
                }
-               stringToCompare = String(config.altItemNames[i]);
             }
-            else
+            else if(isMatching)
             {
-               stringToCompare = String(itemNames[i]);
+               matchingID = i;
+               return true;
             }
+            i++;
+         }
+         if(INVERSE)
+         {
+            return allMatch;
+         }
+         return isMatching;
+      }
+      
+      private static function isMatchingTransferItemName(param1:String, config:Object) : Boolean
+      {
+         var stringToCompare:String = null;
+         var isMatching:Boolean = false;
+         var matchMode:String = String(config.matchMode);
+         var itemName:String = param1;
+         var INVERSE:Boolean = matchMode === MatchMode.NOT_CONTAINS || matchMode === MatchMode.NOT_EXACT;
+         var allMatch:Boolean = true;
+         var itemNames:Array = [];
+         var i:int = 0;
+         while(i < config.itemNames.length)
+         {
+            var j:int = 0;
+            while(j < config.itemNames[i].length)
+            {
+               if(_config.itemNamesGroupConfig[config.itemNames[i][j]] != null)
+               {
+                  itemNames = itemNames.concat(_config.itemNamesGroupConfig[config.itemNames[i][j]]);
+               }
+               else
+               {
+                  itemNames.push(config.itemNames[i][j]);
+               }
+               j++;
+            }
+            i++;
+         }
+         i = 0;
+         while(i < itemNames.length)
+         {
+            stringToCompare = String(itemNames[i]);
             isMatching = isMatchingString(itemName,stringToCompare,matchMode);
             if(INVERSE)
             {
@@ -312,6 +355,16 @@ package
             return isMatchingItemName(param3,param2,isAlt);
          }
          return isMatchingType(param1,param2) && isMatchingItemName(param3,param2);
+      }
+      
+      private static function isItemMatchingTransferConfig(param1:Object, param2:Object) : Boolean
+      {
+         param3 = String(param1.text);
+         if(param3 == null || param3.length < 1 || param3 == "")
+         {
+            return false;
+         }
+         return isMatchingType(param1,param2) && isMatchingTransferItemName(param3,param2);
       }
       
       public static function isTheSameCharacterName(sectionConfig:Object, debug:Boolean = false) : Boolean
@@ -647,17 +700,16 @@ package
                {
                   newMatches[0][0].push(item);
                }
-               else
+               else if(sectionConfig.singleItemPerName)
                {
-                  errorCode = "loopInv " + index + " check2";
                   indexNames = 0;
                   while(indexNames < sectionConfig.itemNames.length)
                   {
-                     errorCode = "loopInv " + index + " check2 " + indexNames;
+                     errorCode = "loopInv sipn " + index + " check2 " + indexNames;
                      indexNamesAlts = 0;
                      while(indexNamesAlts < sectionConfig.itemNames[indexNames].length)
                      {
-                        errorCode = "loopInv " + index + " check2 " + indexNames + " " + indexNamesAlts;
+                        errorCode = "loopInv sipn " + index + " check2 " + indexNames + " " + indexNamesAlts;
                         isMatching = isMatchingType(item,sectionConfig) && isMatchingString(item.text,sectionConfig.itemNames[indexNames][indexNamesAlts],sectionConfig.matchMode);
                         if(isMatching)
                         {
@@ -666,6 +718,15 @@ package
                         indexNamesAlts++;
                      }
                      indexNames++;
+                  }
+               }
+               else
+               {
+                  errorCode = "loopInv mipn " + index;
+                  isMatching = isItemMatchingTransferConfig(item,sectionConfig);
+                  if(isMatching)
+                  {
+                     newMatches[0][0].push(item);
                   }
                }
                index++;
