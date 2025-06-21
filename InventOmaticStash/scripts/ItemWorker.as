@@ -522,7 +522,7 @@ package
          return ReturnDelay;
       }
       
-      public function prepTransferConfig(sectionConfig:Object) : Object
+      public function prepTransferAlts(sectionConfig:Object) : Object
       {
          var i:int = 0;
          var prepItemNames:Array = new Array(sectionConfig.itemNames.length);
@@ -678,24 +678,24 @@ package
       {
          var item:Object;
          var itemInDestination:Object;
-         var invertDestination:Boolean;
          var filtered:Array;
-         var j:int;
-         var k:int;
          errorCode = "init";
          var ReturnDelay:uint = 0;
          var fromContainer:Boolean = param2;
          var config:Object = param3;
-         var countItemsToTransfer:Boolean = false;
-         var end:Boolean = false;
          var i:int = 0;
+         var j:int = 0;
+         var k:int = 0;
          var delay:uint = 0;
          var repeat:uint = 1;
          var amount:int = 0;
          var maxItems:int = 0;
          var amountItemsTransferred:int = 0;
          var amountStacksTransferred:int = 0;
+         var end:Boolean = false;
+         var invertDestination:Boolean = false;
          var singleItemPerName:Boolean = false;
+         var countItemsToTransfer:Boolean = false;
          var inventory:Array = param1;
          _queue = new Vector.<Object>();
          var destinationMap:* = null;
@@ -704,7 +704,7 @@ package
             try
             {
                errorCode = "prep";
-               config.itemNames = prepTransferConfig(config);
+               config.itemNames = prepTransferAlts(config);
                errorCode = "filter";
                filtered = findMatches(inventory,config);
                errorCode = "amount";
