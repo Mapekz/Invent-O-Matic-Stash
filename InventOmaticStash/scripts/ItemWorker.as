@@ -643,23 +643,30 @@ package
             }
             else
             {
-               errorCode = "loopInv " + index + " check2";
-               indexNames = 0;
-               while(indexNames < sectionConfig.itemNames.length)
+               if(item.isLegendary && sectionConfig.transferLegendaries.indexOf(item.numLegendaryStars) != -1 || transferTaggedForSearch && item.taggedForSearch)
                {
-                  errorCode = "loopInv " + index + " check2 " + indexNames;
-                  indexNamesAlts = 0;
-                  while(indexNamesAlts < sectionConfig.itemNames[indexNames].length)
+                  newMatches[0][0].push(item);
+               }
+               else
+               {
+                  errorCode = "loopInv " + index + " check2";
+                  indexNames = 0;
+                  while(indexNames < sectionConfig.itemNames.length)
                   {
-                     errorCode = "loopInv " + index + " check2 " + indexNames + " " + indexNamesAlts;
-                     isMatching = isMatchingType(item,sectionConfig) && isMatchingString(item.text,sectionConfig.itemNames[indexNames][indexNamesAlts],sectionConfig.matchMode);
-                     if(isMatching || item.isLegendary && sectionConfig.transferLegendaries.indexOf(item.numLegendaryStars) != -1 || transferTaggedForSearch && item.taggedForSearch)
+                     errorCode = "loopInv " + index + " check2 " + indexNames;
+                     indexNamesAlts = 0;
+                     while(indexNamesAlts < sectionConfig.itemNames[indexNames].length)
                      {
-                        newMatches[indexNames][indexNamesAlts].push(item);
+                        errorCode = "loopInv " + index + " check2 " + indexNames + " " + indexNamesAlts;
+                        isMatching = isMatchingType(item,sectionConfig) && isMatchingString(item.text,sectionConfig.itemNames[indexNames][indexNamesAlts],sectionConfig.matchMode);
+                        if(isMatching)
+                        {
+                           newMatches[indexNames][indexNamesAlts].push(item);
+                        }
+                        indexNamesAlts++;
                      }
-                     indexNamesAlts++;
+                     indexNames++;
                   }
-                  indexNames++;
                }
                index++;
             }
