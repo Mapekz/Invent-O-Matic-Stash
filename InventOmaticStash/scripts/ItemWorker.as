@@ -20,6 +20,10 @@ package
       private static var characterName:String;
       
       private static var accountName:String;
+      
+      private static var containerName:String;
+      
+      private static var errorCode:String;
        
       
       private var secureTrade:Object;
@@ -35,6 +39,16 @@ package
          this.secureTrade = param1;
          _queue = new Vector.<Object>();
          super();
+      }
+      
+      public static function get ContainerName() : String
+      {
+         return containerName;
+      }
+      
+      public static function set ContainerName(name:String) : void
+      {
+         containerName = name;
       }
       
       public static function get AccountName() : String
@@ -329,6 +343,23 @@ package
          return true;
       }
       
+      public static function isValidContainerName(sectionConfig:Object, debug:Boolean = false) : Boolean
+      {
+         if(sectionConfig.checkContainerName)
+         {
+            var configContainerNames:Array = [].concat(sectionConfig.containerName);
+            if(configContainerNames.indexOf(ContainerName) == -1)
+            {
+               if(debug)
+               {
+                  Logger.get().error("Container name not matching in config: " + ContainerName + " != " + sectionConfig.containerName);
+               }
+               return false;
+            }
+         }
+         return true;
+      }
+      
       private static function get _config() : Object
       {
          return InventOmaticConfig.get();
@@ -492,123 +523,199 @@ package
          return ReturnDelay;
       }
       
+      public function prepTransferConfig(sectionConfig:Object) : Object
+      {
+         var i:int = 0;
+         var prepItemNames:Array = new Array(sectionConfig.itemNames.length);
+         while(i < sectionConfig.itemNames.length)
+         {
+            prepItemNames[i] = new Array();
+            if(sectionConfig.itemNames[i] is Array)
+            {
+               for each(item in sectionConfig.itemNames[i])
+               {
+                  prepItemNames[i].push(item);
+               }
+            }
+            else if(sectionConfig.itemNames[i] is String)
+            {
+               prepItemNames[i].push(sectionConfig.itemNames[i]);
+            }
+            if(sectionConfig.altItemNames && sectionConfig.altItemNames.length > i)
+            {
+               if(sectionConfig.altItemNames[i] is Array)
+               {
+                  for each(item in sectionConfig.altItemNames[i])
+                  {
+                     prepItemNames[i].push(item);
+                  }
+               }
+               else if(sectionConfig.altItemNames[i] is String)
+               {
+                  prepItemNames[i].push(sectionConfig.altItemNames[i]);
+               }
+            }
+            i++;
+         }
+         return prepItemNames;
+      }
+      
+      private function findMatches(inventory:Array, sectionConfig:Object) : Array
+      {
+         var index:int = 0;
+         var indexNames:int = 0;
+         var indexNamesAlts:int = 0;
+         var item:Object = null;
+         var isMatching:Boolean = false;
+         errorCode = "newMatches";
+         var newMatches:Array = new Array(sectionConfig.itemNames.length);
+         errorCode = "transferTaggedForSearch";
+         var transferTaggedForSearch:Boolean = Boolean(sectionConfig.transferTaggedForSearch);
+         errorCode = "transferLegendaries";
+         if(sectionConfig.transferLegendaries is Array)
+         {
+            errorCode = "transferLegendaries array";
+            var transferLegendaries:Array = sectionConfig.transferLegendaries;
+         }
+         else if(sectionConfig.transferLegendaries is Number)
+         {
+            errorCode = "transferLegendaries number";
+            transferLegendaries = [];
+            var i:int = 1;
+            while(i <= sectionConfig.transferLegendaries)
+            {
+               transferLegendaries.push(i);
+               i++;
+            }
+         }
+         else if(Boolean(sectionConfig.transferLegendaries))
+         {
+            errorCode = "transferLegendaries bool";
+            transferLegendaries = [1,2,3,4,5];
+         }
+         else
+         {
+            errorCode = "transferLegendaries false";
+            transferLegendaries = [];
+         }
+         sectionConfig.transferLegendaries = transferLegendaries;
+         errorCode = "loop itemNames";
+         while(indexNames < sectionConfig.itemNames.length)
+         {
+            indexNamesAlts = 0;
+            errorCode = "loop newMatches " + indexNames;
+            newMatches[indexNames] = new Array(sectionConfig.itemNames[indexNames].length);
+            errorCode = "loop2 " + indexNames;
+            while(indexNamesAlts < sectionConfig.itemNames[indexNames].length)
+            {
+               errorCode = "loop2 " + indexNames + " " + indexNamesAlts;
+               newMatches[indexNames][indexNamesAlts] = new Array();
+               indexNamesAlts++;
+            }
+            indexNames++;
+         }
+         errorCode = "loopInv";
+         index = 0;
+         while(index < inventory.length)
+         {
+            errorCode = "loopInv " + index;
+            item = inventory[index];
+            errorCode = "loopInv " + index + " check1";
+            if(!Boolean(sectionConfig.transferFavorite) && item.favorite)
+            {
+               index++;
+            }
+            else if(!Boolean(sectionConfig.transferEquipped) && item.equipState == 1)
+            {
+               index++;
+            }
+            else if(!Boolean(sectionConfig.transferAssigned) && item.vendingData && item.vendingData.machineType != 0)
+            {
+               index++;
+            }
+            else
+            {
+               errorCode = "loopInv " + index + " check2";
+               indexNames = 0;
+               while(indexNames < sectionConfig.itemNames.length)
+               {
+                  errorCode = "loopInv " + index + " check2 " + indexNames;
+                  indexNamesAlts = 0;
+                  while(indexNamesAlts < sectionConfig.itemNames[indexNames].length)
+                  {
+                     errorCode = "loopInv " + index + " check2 " + indexNames + " " + indexNamesAlts;
+                     isMatching = isMatchingType(item,sectionConfig) && isMatchingString(item.text,sectionConfig.itemNames[indexNames][indexNamesAlts],sectionConfig.matchMode);
+                     if(isMatching || transferLegendaries.indexOf(item.numLegendaryStars) != -1 || transferTaggedForSearch && item.taggedForSearch)
+                     {
+                        newMatches[indexNames][indexNamesAlts].push(item);
+                     }
+                     indexNamesAlts++;
+                  }
+                  indexNames++;
+               }
+               index++;
+            }
+         }
+         return newMatches;
+      }
+      
       private function transfer(param1:Array, param2:Boolean, param3:Object) : uint
       {
-         var transferIDs:Vector.<Vector.<Object>>;
-         var transferIDsAlt:Vector.<Vector.<Object>>;
          var item:Object;
-         var transferTaggedForSearch:Boolean;
+         var itemInDestination:Object;
          var invertDestination:Boolean;
-         var itemInDestination:*;
+         var filtered:Array;
+         var j:int;
+         var k:int;
+         errorCode = "init";
          var ReturnDelay:uint = 0;
          var fromContainer:Boolean = param2;
          var config:Object = param3;
          var countItemsToTransfer:Boolean = false;
          var i:int = 0;
-         var indexNames:int = 0;
          var delay:uint = 0;
          var repeat:uint = 1;
-         var transferLegendary:int = 0;
          var amount:int = 0;
-         var amountTransferred:int = 0;
          var maxItems:int = 0;
-         var isMatching:Boolean = false;
-         var endItem:Boolean = false;
-         var endAll:Boolean = false;
          var amountItemsTransferred:int = 0;
+         var amountStacksTransferred:int = 0;
+         var singleItemPerName:Boolean = false;
          var inventory:Array = param1;
          _queue = new Vector.<Object>();
          var destinationMap:* = null;
          if(inventory && inventory.length > 0)
          {
-            amount = Parser.parseNumber(config.amount,0);
-            maxItems = int(config.maxItems);
-            transferLegendary = Parser.parseNumber(config.transferLegendaries,false);
-            transferTaggedForSearch = Parser.parseBoolean(config.transferTaggedForSearch,false);
-            matchingID = -1;
-            transferIDs = new Vector.<Vector.<Object>>(config.itemNames.length);
-            transferIDsAlt = new Vector.<Vector.<Object>>(config.itemNames.length);
             try
             {
+               errorCode = "prep";
+               config.itemNames = prepTransferConfig(config);
+               errorCode = "filter";
+               filtered = findMatches(inventory,config);
+               errorCode = "amount";
+               amount = Parser.parseNumber(config.amount,0);
+               errorCode = "max";
+               maxItems = int(config.maxItems);
+               singleItemPerName = Boolean(config.singleItemPerName);
+               matchingID = -1;
                if(maxItems > 0)
                {
                   countItemsToTransfer = true;
                }
-               while(indexNames < config.itemNames.length)
-               {
-                  transferIDs[indexNames] = new Vector.<Object>();
-                  transferIDsAlt[indexNames] = new Vector.<Object>();
-                  indexNames++;
-               }
-               while(i < inventory.length)
-               {
-                  if(!Boolean(config.transferFavorite) && inventory[i].favorite)
-                  {
-                     i++;
-                  }
-                  else if(!Boolean(config.transferEquipped) && inventory[i].equipState == 1)
-                  {
-                     i++;
-                  }
-                  else if(!Boolean(config.transferAssigned) && inventory[i].vendingData && inventory[i].vendingData.machineType != 0)
-                  {
-                     i++;
-                  }
-                  else
-                  {
-                     isMatching = isItemMatchingConfig(inventory[i],config);
-                     if(isMatching || Boolean(transferLegendary) && inventory[i].numLegendaryStars >= transferLegendary || transferTaggedForSearch && inventory[i].taggedForSearch)
-                     {
-                        if(matchingID == -1 || matchingID >= config.itemNames.length)
-                        {
-                           if(config.debug)
-                           {
-                              Logger.get().info(inventory[i].text + " (" + inventory[i].count + ") matching: " + (transferTaggedForSearch ? "taggedForSearch" : "legendary"));
-                           }
-                           transferIDs[0].push(inventory[i]);
-                        }
-                        else
-                        {
-                           if(config.debug)
-                           {
-                              Logger.get().info(inventory[i].text + " (" + inventory[i].count + ") matching: itemName " + (matchingID < config.itemNames.length ? config.itemNames[matchingID] : -1));
-                           }
-                           transferIDs[matchingID].push(inventory[i]);
-                        }
-                     }
-                     else if(isItemMatchingConfig(inventory[i],config,true))
-                     {
-                        if(config.debug)
-                        {
-                           Logger.get().info(inventory[i].text + " (" + inventory[i].count + ") matching altItemName " + (matchingID < config.altItemNames.length ? config.altItemNames[matchingID] : -1));
-                        }
-                        if(matchingID == -1 || matchingID >= config.altItemNames.length)
-                        {
-                           transferIDsAlt[0].push(inventory[i]);
-                        }
-                        else
-                        {
-                           transferIDsAlt[matchingID].push(inventory[i]);
-                        }
-                     }
-                     i++;
-                  }
-               }
                i = 0;
-               endItem = false;
-               endAll = false;
-               amountItemsTransferred = 0;
-               while(i < config.itemNames.length && !endAll)
+               amountStacksTransferred = 0;
+               while(i < filtered.length)
                {
-                  endItem = false;
-                  amountTransferred = 0;
-                  if(transferIDs[i].length > 0)
+                  amountItemsTransferred = 0;
+                  j = 0;
+                  while(j < filtered[i].length)
                   {
-                     indexNames = transferIDs[i].length - 1;
-                     while(indexNames >= 0)
+                     k = 0;
+                     while(k < filtered[i][j].length)
                      {
-                        item = transferIDs[i][indexNames];
-                        amount = getAmount(int(config.amount),item.count);
+                        errorCode = "item " + i + " " + j + " " + k;
+                        item = filtered[i][j][k];
+                        errorCode = "item amount " + i + " " + j + " " + k;
+                        amount = getAmount(int(config.amount),item.count,singleItemPerName ? amountItemsTransferred : 0);
                         invertDestination = false;
                         itemInDestination = null;
                         if(config.exactAmountInDestination)
@@ -624,7 +731,7 @@ package
                               {
                                  if(config.debug)
                                  {
-                                    Logger.get().info("exactAmountInDestination (true): direction inverted for " + item.text);
+                                    Logger.get().info("exactAmountInDestination: direction inverted for " + item.text);
                                  }
                                  invertDestination = true;
                                  amount = itemInDestination.count - config.amount;
@@ -637,92 +744,64 @@ package
                         }
                         if(amount != 0)
                         {
-                           if(config.singleItemPerName)
+                           errorCode = "item amount != 0 " + i + " " + j + " " + k;
+                           amountStacksTransferred++;
+                           if(countItemsToTransfer && amountStacksTransferred > maxItems)
                            {
-                              amount = 1;
-                           }
-                           if(countItemsToTransfer && ++amountItemsTransferred > maxItems)
-                           {
-                              endAll = true;
+                              j = int.MAX_VALUE;
+                              i = int.MAX_VALUE;
                               break;
                            }
                            if(config.debug)
                            {
                               Logger.get().info("Item queued: " + item.text + " (" + amount + "/" + item.count + ")");
                            }
-                           _queue.push({
-                              "text":item.text,
-                              "serverHandleID":(invertDestination ? itemInDestination.serverHandleID : item.serverHandleID),
-                              "containerID":(invertDestination ? itemInDestination.containerID : item.containerID),
-                              "count":amount,
-                              "fromContainer":(invertDestination ? !fromContainer : fromContainer)
-                           });
-                           amountTransferred++;
-                           if(config.singleItemPerName && amountTransferred >= int(config.amount))
+                           errorCode = "item amount != 0 push " + i + " " + j + " " + k;
+                           if(invertDestination)
                            {
-                              endItem = true;
-                              break;
+                              _queue.push({
+                                 "text":item.text,
+                                 "serverHandleID":itemInDestination.serverHandleID,
+                                 "containerID":itemInDestination.containerID,
+                                 "count":amount,
+                                 "fromContainer":!fromContainer
+                              });
+                           }
+                           else
+                           {
+                              _queue.push({
+                                 "text":item.text,
+                                 "serverHandleID":item.serverHandleID,
+                                 "containerID":item.containerID,
+                                 "count":amount,
+                                 "fromContainer":fromContainer
+                              });
+                           }
+                           amountItemsTransferred += amount;
+                           if(config.amount > 0 && amountItemsTransferred >= config.amount)
+                           {
+                              if(singleItemPerName)
+                              {
+                                 j = int.MAX_VALUE;
+                                 break;
+                              }
                            }
                         }
-                        indexNames--;
+                        k++;
                      }
-                     if(endAll)
-                     {
-                        break;
-                     }
-                     if(!config.singleItemPerName || endItem)
-                     {
-                        i++;
-                        continue;
-                     }
-                  }
-                  if(transferIDsAlt[i].length > 0)
-                  {
-                     indexNames = transferIDsAlt[i].length - 1;
-                     while(indexNames >= 0)
-                     {
-                        item = transferIDsAlt[i][indexNames];
-                        amount = getAmount(int(config.amount),item.count);
-                        if(amount != 0)
-                        {
-                           if(config.singleItemPerName)
-                           {
-                              amount = 1;
-                           }
-                           if(countItemsToTransfer && ++amountItemsTransferred > maxItems)
-                           {
-                              endAll = true;
-                              break;
-                           }
-                           if(config.debug)
-                           {
-                              Logger.get().info("AltItem queued: " + item.text + " (" + amount + "/" + item.count + ")");
-                           }
-                           _queue.push({
-                              "text":item.text,
-                              "serverHandleID":item.serverHandleID,
-                              "containerID":item.containerID,
-                              "count":amount,
-                              "fromContainer":fromContainer
-                           });
-                           amountTransferred++;
-                           if(config.singleItemPerName && amountTransferred >= int(config.amount))
-                           {
-                              break;
-                           }
-                        }
-                        indexNames--;
-                     }
+                     j++;
                   }
                   i++;
                }
-               if(endAll)
+               errorCode = "max check";
+               if(countItemsToTransfer && amountStacksTransferred >= maxItems)
                {
                   if(config.debug)
                   {
                      Logger.get().info("Transfer maxItems limit reached: " + maxItems);
                   }
                }
+               errorCode = "test";
                if(Parser.parseBoolean(config.testRun,false))
                {
                   showTestRun("TRANSFER (" + config.name + ")");
@@ -735,7 +814,7 @@ package
             }
             catch(e:Error)
             {
-               Logger.get().errorHandler("Error ItemWorker scrap",e);
+               Logger.get().errorHandler("Error ItemWorker transfer " + errorCode,e);
             }
          }
          return ReturnDelay;
@@ -755,27 +834,42 @@ package
          _queueIndex++;
       }
       
-      private function getAmount(amount:int, itemCount:int) : int
+      private function getAmount(configAmount:int, itemCount:int, alreadyTransferred:int = 0) : int
       {
          var _amount:int = 0;
-         if(!amount || isNaN(amount) || amount == 0 || amount >= itemCount)
+         if(!configAmount || isNaN(configAmount) || configAmount == 0)
          {
             _amount = itemCount;
          }
-         else if(amount < 0)
+         else if(configAmount < 0)
          {
-            if(itemCount > -amount)
+            if(itemCount > -configAmount)
             {
-               _amount = itemCount + amount;
+               _amount = itemCount + configAmount;
             }
             else
             {
                _amount = 0;
             }
          }
+         else if(alreadyTransferred != 0)
+         {
+            if(configAmount - alreadyTransferred >= itemCount)
+            {
+               _amount = itemCount;
+            }
+            else
+            {
+               _amount = configAmount - alreadyTransferred;
+            }
+         }
+         else if(configAmount >= itemCount)
+         {
+            _amount = itemCount;
+         }
          else
          {
-            _amount = amount;
+            _amount = configAmount;
          }
          return _amount;
       }
@@ -1185,7 +1279,7 @@ package
       {
          if(config && config.enabled && config.itemNames && config.itemNames.length > 0 && (Boolean(config.direction) || config.onlyHighlightedItem))
          {
-            return isTheSameCharacterName(config,debug && config.debug);
+            return isTheSameCharacterName(config,debug && config.debug) && isValidContainerName(config,debug && config.debug);
          }
          return false;
       }

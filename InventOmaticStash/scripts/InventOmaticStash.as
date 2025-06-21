@@ -890,7 +890,8 @@ package
          {
             if(offerHeader == "")
             {
-               offerHeader = this.parentClip.OfferInventory_mc.Header_mc.Header_tf.text.toUpperCase();
+               offerHeader = this.parentClip.OfferInventory_mc.Header_mc.Header_tf.text;
+               ItemWorker.ContainerName = offerHeader;
                Logger.get().info("Offer header: " + offerHeader);
             }
             if(!config || !config.showCategoryItemCount)
