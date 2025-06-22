@@ -882,6 +882,10 @@ package utils
             return "";
          }
          var resistances:Array = [ItemCardData.findResistanceValue(itemCard.itemCardEntries,1),ItemCardData.findResistanceValue(itemCard.itemCardEntries,4),ItemCardData.findResistanceValue(itemCard.itemCardEntries,6)];
+         if(resistances[0] == 0 && resistances[1] == 0 && resistances[2] == 0)
+         {
+            return "";
+         }
          var armorType:String = getArmorTypeFromName(armorFullName);
          if(armorType == "")
          {

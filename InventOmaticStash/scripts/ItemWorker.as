@@ -742,7 +742,7 @@ package
                else
                {
                   errorCode = "loopInv mipn " + index;
-                  isMatching = isItemMatchingTransferConfig(item,sectionConfig) && isItemMatchingLegendaryConfig(item,sectionConfig);
+                  isMatching = isItemMatchingTransferConfig(item,sectionConfig) && isItemMatchingLegendaryConfig(item,sectionConfig) && isItemMatchingArmorGradeConfig(item,sectionConfig);
                   if(isMatching)
                   {
                      newMatches[0][0].push(item);
@@ -1692,7 +1692,6 @@ package
          var indexConfig:int = 0;
          var validConfigs:Array = [];
          var fetchItemCardEntriesDelay:uint = 0;
-         var checkLegendaryEffects:Boolean = false;
          while(indexConfig < _config.transferConfig.length)
          {
             config = _config.transferConfig[indexConfig];
@@ -1700,9 +1699,8 @@ package
             if(hotkeyMatch && this.isValidTransferConfig(config,true))
             {
                Logger.get().info("Valid transfer config: " + config.name);
-               if(config.checkLegendaryEffects)
+               if(config.checkLegendaryEffects || config.checkArmorGrade)
                {
-                  checkLegendaryEffects = true;
                   Logger.get().info("Checking legendary effects for: " + config.name);
                   direction = String(config.direction);
                   if(DIRECTION_TO_CONTAINER === direction ^ shift)

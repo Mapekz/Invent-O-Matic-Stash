@@ -56,7 +56,7 @@ package utils
                i++;
             }
          }
-         return "";
+         return 0;
       }
       
       private static function onInventoryItemCardDataUpdate(e:FromClientDataEvent) : void
