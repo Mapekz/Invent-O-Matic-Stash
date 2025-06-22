@@ -712,7 +712,7 @@ package
                {
                   newMatches[0][0].push(item);
                }
-               else if(item.isLegendary && sectionConfig.transferLegendaries.indexOf(item.numLegendaryStars) != -1)
+               else if(!sectionConfig.checkLegendaryEffects && item.isLegendary && sectionConfig.transferLegendaries.indexOf(item.numLegendaryStars) != -1)
                {
                   newMatches[0][0].push(item);
                }
@@ -803,6 +803,10 @@ package
             return true;
          }
          if(!item.isLegendary)
+         {
+            return false;
+         }
+         if(config.transferLegendaries.indexOf(item.numLegendaryStars) == -1)
          {
             return false;
          }
