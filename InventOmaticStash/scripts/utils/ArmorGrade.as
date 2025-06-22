@@ -3,7 +3,7 @@ package utils
    public class ArmorGrade
    {
       
-      private static var GRADED_ARMOR:Object = {
+      private static const GRADED_ARMOR:Object = {
          "COMBAT":{
             "CHEST":{
                "DEFAULT":{
@@ -727,19 +727,19 @@ package utils
       };
       
       private static const UNGRADED_ARMOR:Object = {
-         "WOOD":"Light",
-         "BOTSMITH":"Heavy",
-         "MARINE":"Sturdy",
-         "ARCTIC_MARINE":"Sturdy",
-         "TRAPPER":"Sturdy",
-         "FOREST_SCOUT":"Light",
-         "URBAN_SCOUT":"Light",
-         "COVERT_SCOUT":"Light",
-         "SOLAR":"Light",
-         "THORN":"Light",
-         "BROTHERHOOD":"Heavy",
-         "SECRET_SERVICE":"Heavy",
-         "CIVIL_ENGINEER":"Sturdy"
+         "WOOD":"LIGHT",
+         "BOTSMITH":"HEAVY",
+         "MARINE":"STURDY",
+         "ARCTIC_MARINE":"STURDY",
+         "TRAPPER":"STURDY",
+         "FOREST_SCOUT":"LIGHT",
+         "URBAN_SCOUT":"LIGHT",
+         "COVERT_SCOUT":"LIGHT",
+         "SOLAR":"LIGHT",
+         "THORN":"LIGHT",
+         "BROTHERHOOD":"HEAVY",
+         "SECRET_SERVICE":"HEAVY",
+         "CIVIL_ENGINEER":"STURDY"
       };
       
       private static var ARMOR_TYPES:Object = {
@@ -774,13 +774,13 @@ package utils
          "X_01":"X-01"
       };
       
-      private static const ARMOR_GRADES:Object = {
+      private static var ARMOR_GRADES:Object = {
          "LIGHT":"Light",
          "STURDY":"Sturdy",
          "HEAVY":"Heavy"
       };
       
-      private static const ARMOR_PIECES:Object = {
+      private static var ARMOR_PIECES:Object = {
          "LEFT_ARM":"Left Arm",
          "LEFT_LEG":"Left Leg",
          "RIGHT_ARM":"Right Arm",
@@ -790,7 +790,7 @@ package utils
          "PA_HELMET":"Helmet"
       };
       
-      private static const ARMOR_PREFIXES:Object = {
+      private static var ARMOR_PREFIXES:Object = {
          "REINFORCED":"Reinforced",
          "SHADOWED":"Shadowed",
          "FIBERGLASS":"Fiberglass",
@@ -810,11 +810,11 @@ package utils
          "BUTTRESSED":"Buttressed"
       };
       
+      private static var ARMOR_MOD_LEADED:String = "Leaded";
+      
       private static const ARMOR_GRADE_HEAVY:String = "HEAVY";
       
       private static const ARMOR_GRADE_STURDY:String = "STURDY";
-      
-      private static const ARMOR_MOD_LEADED:String = "Leaded";
        
       
       public function ArmorGrade()
@@ -827,14 +827,13 @@ package utils
          return [initResistances[0] - resistances[0],initResistances[1] - resistances[1],initResistances[2] - resistances[2]];
       }
       
-      private static function getArmorPieceFromName(itemText:String) : String
+      public static function getArmorPieceFromName(itemText:String) : String
       {
-         var _itemText:String = itemText.toLower();
          for(piece in ARMOR_PIECES)
          {
             if(ARMOR_PIECES[piece].split("||").some(function(element:*, index:int, arr:Array):Boolean
             {
-               return _itemText.indexOf(element) != -1;
+               return itemText.indexOf(element) != -1;
             }))
             {
                return piece;
@@ -843,11 +842,11 @@ package utils
          return "";
       }
       
-      private static function getArmorTypeFromName(itemText:String) : String
+      public static function getArmorTypeFromName(itemText:String) : String
       {
          for(type in ARMOR_TYPES)
          {
-            if(item_text.indexOf(ARMOR_TYPES[type]) != -1)
+            if(itemText.indexOf(ARMOR_TYPES[type]) != -1)
             {
                return type;
             }
@@ -870,70 +869,105 @@ package utils
       
       public static function lookupArmorGrade(item:Object) : String
       {
-         if(!(item.filterFlag & 8))
+         var armorFullName:String;
+         var armorLevel:String;
+         var itemCard:Object;
+         var resistances:Array;
+         var armorType:String;
+         var armorPiece:String;
+         var piece:String;
+         var sResistances:*;
+         var grade:String;
+         var errorCode:String = 0;
+         try
          {
-            return "";
-         }
-         var armorFullName:String = item.text;
-         var armorLevel:int = int(item.itemLevel);
-         var itemCard:Object = ItemCardData.get(serverHandleID);
-         if(itemCard == null)
-         {
-            return "";
-         }
-         var resistances:Array = [ItemCardData.findResistanceValue(itemCard.itemCardEntries,1),ItemCardData.findResistanceValue(itemCard.itemCardEntries,4),ItemCardData.findResistanceValue(itemCard.itemCardEntries,6)];
-         if(resistances[0] == 0 && resistances[1] == 0 && resistances[2] == 0)
-         {
-            return "";
-         }
-         var armorType:String = getArmorTypeFromName(armorFullName);
-         if(armorType == "")
-         {
-            return "";
-         }
-         if(GRADED_ARMOR[armorType] == null)
-         {
-            return UNGRADED_ARMOR[armorType] || "";
-         }
-         var armorPiece:String = getArmorTypeFromName(armorFullName);
-         if(armorPiece == "")
-         {
-            return "";
-         }
-         var piece:String = "";
-         if(armorPiece == "CHEST_PIECE")
-         {
-            piece = "CHEST";
-         }
-         else if(armorType == "ROBOT")
-         {
-            if(armorPiece == "LEFT_ARM" || armorPiece == "RIGHT_ARM")
+            errorCode = "filterFlag";
+            if(!(item.filterFlag & 8))
             {
-               piece = "ARM";
+               return "FLT_MSMC";
+            }
+            armorFullName = item.text;
+            grade = getArmorGradeFromName(armorFullName);
+            if(grade != "")
+            {
+               return grade;
+            }
+            armorLevel = String(item.itemLevel);
+            errorCode = "itemCard";
+            itemCard = ItemCardData.get(item.serverHandleID);
+            if(itemCard == null)
+            {
+               return "ITC_NULL";
+            }
+            errorCode = "resistances";
+            resistances = [ItemCardData.findResistanceValue(itemCard.itemCardEntries,1),ItemCardData.findResistanceValue(itemCard.itemCardEntries,4),ItemCardData.findResistanceValue(itemCard.itemCardEntries,6)];
+            if(resistances[0] == 0 && resistances[1] == 0 && resistances[2] == 0)
+            {
+               return "RES_NULL";
+            }
+            errorCode = "armorType";
+            armorType = getArmorTypeFromName(armorFullName);
+            if(armorType == "")
+            {
+               return "ATP_NULL";
+            }
+            errorCode = "GRADED_ARMOR";
+            if(GRADED_ARMOR[armorType] == null)
+            {
+               return UNGRADED_ARMOR[armorType] || "";
+            }
+            errorCode = "armorPiece";
+            armorPiece = getArmorPieceFromName(armorFullName);
+            if(armorPiece == "")
+            {
+               return "APC_NULL";
+            }
+            errorCode = "piece";
+            piece = "";
+            if(armorPiece == "CHEST_PIECE")
+            {
+               piece = "CHEST";
+            }
+            else if(armorType == "ROBOT")
+            {
+               errorCode = "robot";
+               if(armorPiece == "LEFT_ARM" || armorPiece == "RIGHT_ARM")
+               {
+                  piece = "ARM";
+               }
+               else
+               {
+                  piece = "LEG";
+               }
             }
             else
             {
-               piece = "LEG";
+               piece = "LIMB";
             }
-         }
-         else
-         {
-            piece = "LIMB";
-         }
-         for(material in GRADED_ARMOR[armorType][piece])
-         {
-            if(material != "DEFAULT" && armorFullName.indexOf(ARMOR_PREFIXES[material]) != -1)
+            errorCode = "material";
+            for(material in GRADED_ARMOR[armorType][piece])
             {
-               resistances = reduceResistances(resistances,GRADED_ARMOR[armorType][piece][material][armorLevel]);
+               errorCode = "material " + material;
+               if(material != "DEFAULT" && armorFullName.indexOf(ARMOR_PREFIXES[material]) != -1)
+               {
+                  resistances = reduceResistances(resistances,GRADED_ARMOR[armorType][piece][material][armorLevel]);
+               }
             }
+            errorCode = "sRes";
+            sResistances = resistances.join("/");
+            errorCode = "grade";
+            grade = GRADED_ARMOR[armorType][piece]["DEFAULT"][armorLevel][sResistances];
+            if(!grade)
+            {
+               return sResistances + " " + armorType + " " + piece + " " + armorLevel;
+            }
+            return grade;
          }
-         var sResistances:* = resistances.join("/");
-         var grade:String = GRADED_ARMOR[armorType][piece]["DEFAULT"][armorLevel][sResistances];
-         if(!grade)
+         catch(e:*)
          {
-            return sResistances;
+            Logger.get().error("Error looking up armor grade: " + errorCode + " : " + e);
          }
-         return grade;
+         return "";
       }
    }
 }

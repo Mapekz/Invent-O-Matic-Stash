@@ -5,10 +5,7 @@ package
    import com.adobe.serialization.json.JSONEncoder;
    import extractors.GameApiDataExtractor;
    import flash.utils.setTimeout;
-   import utils.ItemCardData;
-   import utils.LegendaryMods;
-   import utils.Logger;
-   import utils.Parser;
+   import utils.*;
    
    public class ItemWorker
    {
@@ -761,27 +758,20 @@ package
          var armorGrade:String;
          try
          {
+            errorCode = "init";
             if(!config.checkArmorGrade || !(item.filterFlag & 8))
             {
                return true;
             }
+            errorCode = "itemCard";
             itemCard = ItemCardData.get(item.serverHandleID);
             if(itemCard == null)
             {
                return false;
             }
+            errorCode = "armorGrade";
             armorGrade = ArmorGrade.lookupArmorGrade(item);
             Logger.get().info(item.text + " grade: " + armorGrade);
-            if(false)
-            {
-               switch(config.legendaryEffectsMatchMode)
-               {
-                  case MatchMode.EXACT:
-                  case MatchMode.CONTAINS:
-                  case MatchMode.NOT_CONTAINS:
-               }
-               Logger.get().error("Invalid legendary match mode: " + config.legendaryEffectsMatchMode);
-            }
          }
          catch(e:*)
          {
