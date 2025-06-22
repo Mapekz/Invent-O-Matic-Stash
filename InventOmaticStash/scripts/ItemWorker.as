@@ -670,8 +670,6 @@ package
          var newMatches:Array = new Array(sectionConfig.itemNames.length);
          errorCode = "transferTaggedForSearch";
          var transferTaggedForSearch:Boolean = Boolean(sectionConfig.transferTaggedForSearch);
-         errorCode = "transferLegendaries";
-         sectionConfig.transferLegendaries = prepTransferLegendaries(sectionConfig);
          errorCode = "loop itemNames";
          while(indexNames < sectionConfig.itemNames.length)
          {
@@ -1659,7 +1657,7 @@ package
             i = 0;
             while(i < inventory.length)
             {
-               if(inventory[i].isLegendary || inventory[i].filterFlag & 8)
+               if(inventory[i].isLegendary && (config.transferLegendaries.length == 0 || config.transferLegendaries.indexOf(inventory[i].numLegendaryStars) != -1) || inventory[i].filterFlag & 8)
                {
                   if(isItemMatchingConfig(inventory[i],config))
                   {
@@ -1742,6 +1740,7 @@ package
             if(hotkeyMatch && this.isValidTransferConfig(config,true))
             {
                Logger.get().info("Valid transfer config: " + config.name);
+               config.transferLegendaries = prepTransferLegendaries(config);
                if(config.checkLegendaryEffects || config.checkArmorGrade)
                {
                   if(config.debug)
