@@ -186,7 +186,7 @@ package extractors
                      case "armorGrade":
                         if(inventory[i].filterFlag & 8)
                         {
-                           line[j] = ArmorGrade.lookupArmorGrade(inventory[i]) || this._extractConfig.customFormat.valueNotFound;
+                           line[j] = ArmorGrade.lookupArmorGrade(inventory[i],true) || this._extractConfig.customFormat.valueNotFound;
                         }
                         else
                         {
@@ -196,7 +196,7 @@ package extractors
                      case "armorPiece":
                         if(inventory[i].filterFlag & 8)
                         {
-                           line[j] = ArmorGrade.getArmorPieceFromName(inventory[i].text) || this._extractConfig.customFormat.valueNotFound;
+                           line[j] = ArmorGrade.getArmorPieceFromName(inventory[i].text,true) || this._extractConfig.customFormat.valueNotFound;
                         }
                         else
                         {
@@ -206,7 +206,7 @@ package extractors
                      case "armorType":
                         if(inventory[i].filterFlag & 8)
                         {
-                           line[j] = ArmorGrade.getArmorTypeFromName(inventory[i].text) || this._extractConfig.customFormat.valueNotFound;
+                           line[j] = ArmorGrade.getArmorTypeFromName(inventory[i].text,true) || this._extractConfig.customFormat.valueNotFound;
                         }
                         else
                         {

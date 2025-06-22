@@ -1691,7 +1691,7 @@ package
                Logger.get().info("Valid transfer config: " + config.name);
                if(config.checkLegendaryEffects || config.checkArmorGrade)
                {
-                  Logger.get().info("Checking legendary effects for: " + config.name);
+                  Logger.get().info("Checking item card entries for: " + config.name);
                   direction = String(config.direction);
                   if(DIRECTION_TO_CONTAINER === direction ^ shift)
                   {

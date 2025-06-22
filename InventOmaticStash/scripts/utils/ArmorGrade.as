@@ -827,7 +827,7 @@ package utils
          return [initResistances[0] - resistances[0],initResistances[1] - resistances[1],initResistances[2] - resistances[2]];
       }
       
-      public static function getArmorPieceFromName(itemText:String) : String
+      public static function getArmorPieceFromName(itemText:String, isLocalized:Boolean = false) : String
       {
          for(piece in ARMOR_PIECES)
          {
@@ -836,19 +836,19 @@ package utils
                return itemText.indexOf(element) != -1;
             }))
             {
-               return piece;
+               return isLocalized ? ARMOR_PIECES[piece].split("||")[0] : piece;
             }
          }
          return "";
       }
       
-      public static function getArmorTypeFromName(itemText:String) : String
+      public static function getArmorTypeFromName(itemText:String, isLocalized:Boolean = false) : String
       {
          for(type in ARMOR_TYPES)
          {
             if(itemText.indexOf(ARMOR_TYPES[type]) != -1)
             {
-               return type;
+               return isLocalized ? ARMOR_TYPES[type] : type;
             }
          }
          return "";
@@ -867,7 +867,7 @@ package utils
          return "";
       }
       
-      public static function lookupArmorGrade(item:Object) : String
+      public static function lookupArmorGrade(item:Object, isLocalized:Boolean = false) : String
       {
          var armorFullName:String;
          var armorLevel:String;
@@ -885,43 +885,47 @@ package utils
             errorCode = "filterFlag";
             if(!(item.filterFlag & 8))
             {
-               return "FLT_MSMC";
+               return "";
             }
             armorFullName = item.text;
             grade = getArmorGradeFromName(armorFullName);
             if(grade != "")
             {
-               return grade;
+               return isLocalized ? ARMOR_GRADES[grade] : grade;
             }
             armorLevel = String(item.itemLevel);
             errorCode = "itemCard";
             itemCard = ItemCardData.get(item.serverHandleID);
             if(itemCard == null)
             {
-               return "ITC_NULL";
+               return "";
             }
             errorCode = "resistances";
             resistances = [ItemCardData.findResistanceValue(itemCard.itemCardEntries,1),ItemCardData.findResistanceValue(itemCard.itemCardEntries,4),ItemCardData.findResistanceValue(itemCard.itemCardEntries,6)];
             if(resistances[0] == 0 && resistances[1] == 0 && resistances[2] == 0)
             {
-               return "RES_NULL";
+               return "";
             }
             errorCode = "armorType";
             armorType = getArmorTypeFromName(armorFullName);
             if(armorType == "")
             {
-               return "ATP_NULL";
+               return "";
             }
             errorCode = "GRADED_ARMOR";
             if(GRADED_ARMOR[armorType] == null)
             {
-               return UNGRADED_ARMOR[armorType] || "";
+               if(UNGRADED_ARMOR[armorType] == null)
+               {
+                  return "";
+               }
+               return isLocalized ? ARMOR_GRADES[UNGRADED_ARMOR[armorType]] : UNGRADED_ARMOR[armorType];
             }
             errorCode = "armorPiece";
             armorPiece = getArmorPieceFromName(armorFullName);
             if(armorPiece == "")
             {
-               return "APC_NULL";
+               return "";
             }
             errorCode = "piece";
             piece = "";
@@ -951,7 +955,7 @@ package utils
                errorCode = "material " + material;
                if(material != "DEFAULT" && armorFullName.indexOf(ARMOR_PREFIXES[material]) != -1)
                {
-                  resistances = reduceResistances(resistances,GRADED_ARMOR[armorType][piece][material][armorLevel]);
+                  resistances = reduceResistances(resistances,GRADED_ARMOR[armorType][piece][material][armorLevel] || [0,0,0]);
                }
             }
             errorCode = "leaded";
@@ -961,6 +965,11 @@ package utils
             }
             errorCode = "sRes";
             sResistances = resistances.join("/");
+            errorCode = "level";
+            if(GRADED_ARMOR[armorType][piece]["DEFAULT"][armorLevel] == null)
+            {
+               return "";
+            }
             errorCode = "grade";
             grade = GRADED_ARMOR[armorType][piece]["DEFAULT"][armorLevel][sResistances];
             if(!grade)
@@ -977,15 +986,16 @@ package utils
                   {
                      return sResistances;
                   }
-                  return grade;
+                  return isLocalized ? ARMOR_GRADES[grade] : grade;
                }
                return sResistances;
             }
-            return grade;
+            return isLocalized ? ARMOR_GRADES[grade] : grade;
          }
          catch(e:*)
          {
             Logger.get().error("Error looking up armor grade: " + errorCode + " : " + e);
+            Logger.get().error(armorType + ", " + armorPiece + "/" + piece + ", " + material + ", " + armorLevel + ", " + sResistances);
          }
          return "";
       }
