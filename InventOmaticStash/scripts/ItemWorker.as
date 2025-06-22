@@ -806,7 +806,7 @@ package
          {
             return false;
          }
-         if(config.transferLegendaries.indexOf(item.numLegendaryStars) == -1)
+         if(config.transferLegendaries.length > 0 && config.transferLegendaries.indexOf(item.numLegendaryStars) == -1)
          {
             return false;
          }
