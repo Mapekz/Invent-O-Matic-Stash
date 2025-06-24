@@ -1711,6 +1711,7 @@ package
                   indexConfig++;
                }
             }
+            config.transferLegendaries = prepTransferLegendaries(config);
             this.transfer(this._stashInventory,true,config);
          }
          else
