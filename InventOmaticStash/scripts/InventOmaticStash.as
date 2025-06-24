@@ -689,9 +689,9 @@ package
             {
                this._parent.Header_mc.visible = false;
             }
-            if(config.showAdditionalColumns != null)
+            if(Boolean(config.showAdditionalColumns) && Boolean(config.additionalColumns))
             {
-               this._parent.ShowAdditionalColumns = config.showAdditionalColumns;
+               this._parent.ShowAdditionalColumns = config.additionalColumns;
             }
          }
          catch(e:Error)
