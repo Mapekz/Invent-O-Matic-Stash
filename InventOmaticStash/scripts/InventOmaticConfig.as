@@ -187,6 +187,7 @@ package
          }
          config.categoryWeightConfig = loadCategoryWeightConfig(config.categoryWeightConfig);
          config.itemNamesGroupConfig = loadItemNamesGroupConfig(config.itemNamesGroupConfig);
+         config.additionalColumnsConfig = loadAdditionalColumnsConfig(config.additionalColumnsConfig);
          initHotkeys(config);
          _config = config;
          return _config;
@@ -330,6 +331,20 @@ package
          if(!config)
          {
             return {};
+         }
+         return config;
+      }
+      
+      private static function loadAdditionalColumnsConfig(config:*) : *
+      {
+         if(!config)
+         {
+            return {"enabled":false};
+         }
+         config.enabled = Boolean(config.enabled);
+         if(!config.columns)
+         {
+            config.columns = {};
          }
          return config;
       }
