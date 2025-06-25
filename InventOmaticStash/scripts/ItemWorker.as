@@ -659,7 +659,7 @@ package
          return transferLegendaries;
       }
       
-      private function findMatches(inventory:Array, sectionConfig:Object) : Array
+      private function findMatches(inventory:Array, sectionConfig:Object, isLoot:Boolean = false) : Array
       {
          var index:int = 0;
          var indexNames:int = 0;
@@ -710,37 +710,47 @@ package
                {
                   newMatches[0][0].push(item);
                }
-               else if(!sectionConfig.checkLegendaryEffects && item.isLegendary && sectionConfig.transferLegendaries.indexOf(item.numLegendaryStars) != -1)
-               {
-                  newMatches[0][0].push(item);
-               }
-               else if(sectionConfig.singleItemPerName)
-               {
-                  indexNames = 0;
-                  while(indexNames < sectionConfig.itemNames.length)
-                  {
-                     errorCode = "loopInv sipn " + index + " check2 " + indexNames;
-                     indexNamesAlts = 0;
-                     while(indexNamesAlts < sectionConfig.itemNames[indexNames].length)
-                     {
-                        errorCode = "loopInv sipn " + index + " check2 " + indexNames + " " + indexNamesAlts;
-                        isMatching = isMatchingType(item,sectionConfig) && isMatchingString(item.text,sectionConfig.itemNames[indexNames][indexNamesAlts],sectionConfig.matchMode);
-                        if(isMatching)
-                        {
-                           newMatches[indexNames][indexNamesAlts].push(item);
-                        }
-                        indexNamesAlts++;
-                     }
-                     indexNames++;
-                  }
-               }
                else
                {
-                  errorCode = "loopInv mipn " + index;
-                  isMatching = isItemMatchingTransferConfig(item,sectionConfig) && isItemMatchingLegendaryConfig(item,sectionConfig) && isItemMatchingArmorGradeConfig(item,sectionConfig);
-                  if(isMatching)
+                  if(isLoot && !sectionConfig.checkLegendaryEffects && item.isLegendary && sectionConfig.transferLegendaries.length > 0 && sectionConfig.transferLegendaries.indexOf(item.numLegendaryStars) != -1)
                   {
                      newMatches[0][0].push(item);
+                     index++;
+                     continue;
+                  }
+                  if(!isLoot && !sectionConfig.checkLegendaryEffects && sectionConfig.transferLegendaries.length > 0 && sectionConfig.transferLegendaries.indexOf(item.numLegendaryStars) == -1)
+                  {
+                     index++;
+                     continue;
+                  }
+                  if(sectionConfig.singleItemPerName)
+                  {
+                     indexNames = 0;
+                     while(indexNames < sectionConfig.itemNames.length)
+                     {
+                        errorCode = "loopInv sipn " + index + " check2 " + indexNames;
+                        indexNamesAlts = 0;
+                        while(indexNamesAlts < sectionConfig.itemNames[indexNames].length)
+                        {
+                           errorCode = "loopInv sipn " + index + " check2 " + indexNames + " " + indexNamesAlts;
+                           isMatching = isMatchingType(item,sectionConfig) && isMatchingString(item.text,sectionConfig.itemNames[indexNames][indexNamesAlts],sectionConfig.matchMode);
+                           if(isMatching)
+                           {
+                              newMatches[indexNames][indexNamesAlts].push(item);
+                           }
+                           indexNamesAlts++;
+                        }
+                        indexNames++;
+                     }
+                  }
+                  else
+                  {
+                     errorCode = "loopInv mipn " + index;
+                     isMatching = isItemMatchingTransferConfig(item,sectionConfig) && isItemMatchingLegendaryConfig(item,sectionConfig) && isItemMatchingArmorGradeConfig(item,sectionConfig);
+                     if(isMatching)
+                     {
+                        newMatches[0][0].push(item);
+                     }
                   }
                }
                index++;
@@ -908,7 +918,7 @@ package
          return false;
       }
       
-      private function transfer(param1:Array, param2:Boolean, param3:Object) : uint
+      private function transfer(param1:Array, param2:Boolean, param3:Object, isLoot:Boolean = false) : uint
       {
          var item:Object;
          var itemInDestination:Object;
@@ -940,7 +950,7 @@ package
                errorCode = "prep";
                config.itemNames = prepTransferAlts(config);
                errorCode = "filter";
-               filtered = findMatches(inventory,config);
+               filtered = findMatches(inventory,config,isLoot);
                errorCode = "amount";
                amount = Parser.parseNumber(config.amount,0);
                errorCode = "max";
@@ -1712,7 +1722,7 @@ package
                }
             }
             config.transferLegendaries = prepTransferLegendaries(config);
-            this.transfer(this._stashInventory,true,config);
+            this.transfer(this._stashInventory,true,config,true);
          }
          else
          {
