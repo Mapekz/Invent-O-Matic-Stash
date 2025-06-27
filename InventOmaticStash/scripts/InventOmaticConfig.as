@@ -346,6 +346,7 @@ package
          {
             config.columns = {};
          }
+         config.offsetInventories = Parser.parseNumber(config.offsetInventories,125);
          return config;
       }
    }

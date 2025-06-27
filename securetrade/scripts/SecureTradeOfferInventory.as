@@ -5,6 +5,7 @@ package
    import Shared.GlobalFunc;
    import flash.display.MovieClip;
    import flash.events.Event;
+   import flash.events.MouseEvent;
    import flash.text.TextField;
    import scaleform.gfx.Extensions;
    import scaleform.gfx.TextFieldEx;
@@ -53,6 +54,41 @@ package
          TextFieldEx.setTextAutoSize(this.OfferCurrency_tf,TextFieldEx.TEXTAUTOSZ_SHRINK);
          TextFieldEx.setTextAutoSize(this.Tooltip_mc.Tooltip_tf,TextFieldEx.TEXTAUTOSZ_SHRINK);
          TextFieldEx.setTextAutoSize(this.miniTooltip_mc.textField_tf,TextFieldEx.TEXTAUTOSZ_SHRINK);
+      }
+      
+      public function set HeaderSort(value:Boolean) : void
+      {
+         if(value)
+         {
+            this.zValue_tf.addEventListener(MouseEvent.CLICK,this.onMouseClick);
+            this.zWeight_tf.addEventListener(MouseEvent.CLICK,this.onMouseClick);
+            this.zStackWeight_tf.addEventListener(MouseEvent.CLICK,this.onMouseClick);
+         }
+      }
+      
+      private function onMouseClick(event:MouseEvent) : void
+      {
+         try
+         {
+            switch(event.target)
+            {
+               case this.zValue_tf:
+                  GlobalFunc.ShowHUDMessage("sort offer value");
+                  SecureTrade.Instance.SortByHeader(false,5);
+                  break;
+               case this.zWeight_tf:
+                  GlobalFunc.ShowHUDMessage("sort offer wt");
+                  SecureTrade.Instance.SortByHeader(false,6);
+                  break;
+               case this.zStackWeight_tf:
+                  GlobalFunc.ShowHUDMessage("sort offer stack wt");
+                  SecureTrade.Instance.SortByHeader(false,7);
+            }
+         }
+         catch(e:*)
+         {
+            GlobalFunc.ShowHUDMessage("sort offer error " + e);
+         }
       }
       
       public function set ShowAdditionalColumns(param1:Object) : void

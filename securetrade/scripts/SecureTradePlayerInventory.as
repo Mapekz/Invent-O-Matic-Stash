@@ -1,8 +1,10 @@
 package
 {
    import Shared.AS3.BSScrollingList;
+   import Shared.GlobalFunc;
    import flash.display.MovieClip;
    import flash.events.Event;
+   import flash.events.MouseEvent;
    import flash.text.TextField;
    import scaleform.gfx.Extensions;
    import scaleform.gfx.TextFieldEx;
@@ -47,6 +49,41 @@ package
          if(this.PlayerCurrency_tf)
          {
             TextFieldEx.setTextAutoSize(this.PlayerCurrency_tf,TextFieldEx.TEXTAUTOSZ_SHRINK);
+         }
+      }
+      
+      public function set HeaderSort(value:Boolean) : void
+      {
+         if(value)
+         {
+            this.zValue_tf.addEventListener(MouseEvent.CLICK,this.onMouseClick);
+            this.zWeight_tf.addEventListener(MouseEvent.CLICK,this.onMouseClick);
+            this.zStackWeight_tf.addEventListener(MouseEvent.CLICK,this.onMouseClick);
+         }
+      }
+      
+      private function onMouseClick(event:MouseEvent) : void
+      {
+         try
+         {
+            switch(event.target)
+            {
+               case this.zValue_tf:
+                  GlobalFunc.ShowHUDMessage("sort plinv value");
+                  SecureTrade.Instance.SortByHeader(true,5);
+                  break;
+               case this.zWeight_tf:
+                  GlobalFunc.ShowHUDMessage("sort plinv wt");
+                  SecureTrade.Instance.SortByHeader(true,6);
+                  break;
+               case this.zStackWeight_tf:
+                  GlobalFunc.ShowHUDMessage("sort plinv stack wt");
+                  SecureTrade.Instance.SortByHeader(true,7);
+            }
+         }
+         catch(e:*)
+         {
+            GlobalFunc.ShowHUDMessage("sort plinv error " + e);
          }
       }
       

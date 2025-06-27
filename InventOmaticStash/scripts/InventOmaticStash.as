@@ -691,7 +691,7 @@ package
             }
             if(config.additionalColumnsConfig.enabled)
             {
-               this._parent.ShowAdditionalColumns = config.additionalColumnsConfig.columns;
+               this._parent.ShowAdditionalColumns = config.additionalColumnsConfig;
             }
          }
          catch(e:Error)

@@ -195,6 +195,8 @@ package
       public static const REFRESH_SELECTION_NAME_COUNT:int = 2;
       
       public static const HEIGHT_BUFFER:uint = 250;
+      
+      public static var Instance:* = null;
        
       
       public var ButtonHintBar_mc:BSButtonHintBar;
@@ -509,6 +511,7 @@ package
          _loc1_.clipHeight = _loc1_.height * (1 / _loc1_.scaleY);
          this.ModalSetQuantity_mc.alpha = 0;
          this.loadMod("InventOmaticStash.swf");
+         Instance = this;
       }
       
       private function loadMod(param1:String) : void
@@ -543,19 +546,41 @@ package
          }
       }
       
+      public function SortByHeader(isPlayerInventory:Boolean, sortId:int) : void
+      {
+         SortListData(isPlayerInventory ? this.PlayerInventory_mc.ItemList_mc.List_mc.MenuListData : this.OfferInventory_mc.ItemList_mc.List_mc.MenuListData,sortId);
+         if(isPlayerInventory)
+         {
+            this.PlayerInventory_mc.SetIsDirty();
+            this.PlayerInventory_mc.ItemList_mc.SetIsDirty();
+            this.onSelectedDataChanged(null);
+         }
+         else
+         {
+            this.OfferInventory_mc.SetIsDirty();
+            this.OfferInventory_mc.ItemList_mc.SetIsDirty();
+            this.onSelectedDataChanged(null);
+         }
+      }
+      
       public function set ShowAdditionalColumns(param1:Object) : void
       {
-         if(param1)
+         if(param1 && param1.columns)
          {
-            PlayerListEntry.ShowAdditionalColumns = param1;
-            OfferListEntry.ShowAdditionalColumns = param1;
-            setTimeout(function():void
+            PlayerListEntry.ShowAdditionalColumns = param1.columns;
+            OfferListEntry.ShowAdditionalColumns = param1.columns;
+            if(false && param1.enableHeaderSort)
             {
-               PlayerInventory_mc.ShowAdditionalColumns = param1;
-               OfferInventory_mc.ShowAdditionalColumns = param1;
-               PlayerInventory_mc.x -= 125;
-               OfferInventory_mc.x += 125;
-            },1500);
+               PlayerInventory_mc.HeaderSort = true;
+               OfferInventory_mc.HeaderSort = true;
+            }
+            PlayerInventory_mc.ShowAdditionalColumns = param1.columns;
+            OfferInventory_mc.ShowAdditionalColumns = param1.columns;
+            PlayerInventory_mc.x -= param1.offsetInventories;
+            OfferInventory_mc.x += param1.offsetInventories;
+            PlayerInventory_mc.alpha = 1;
+            OfferInventory_mc.alpha = 1;
+            alpha = 1;
          }
       }
       

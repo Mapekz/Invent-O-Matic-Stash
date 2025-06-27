@@ -87,7 +87,7 @@ package
          tf.setTextFormat(font);
          tf.selectable = false;
          tf.mouseWheelEnabled = false;
-         tf.mouseEnabled = false;
+         tf.mouseEnabled = true;
          tf.visible = false;
          tf.filters = [new DropShadowFilter(2,135,0,1,1,1,1,BitmapFilterQuality.HIGH)];
          this.Header_mc.addChild(tf);
