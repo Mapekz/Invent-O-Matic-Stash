@@ -704,6 +704,14 @@ package
             {
                index++;
             }
+            else if(item.filterFlag & 0x0400 && Boolean(sectionConfig.onlyKnownPlans) && !item.isLearnedRecipe)
+            {
+               index++;
+            }
+            else if(item.filterFlag & 0x0400 && Boolean(sectionConfig.onlyUnknownPlans) && item.isLearnedRecipe)
+            {
+               index++;
+            }
             else
             {
                if(transferTaggedForSearch && item.taggedForSearch)
