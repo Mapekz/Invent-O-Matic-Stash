@@ -64,6 +64,12 @@ package utils
          return object.toString();
       }
       
+      public function setPosition(x:int, y:int) : void
+      {
+         this._debugger.x += x;
+         this._debugger.y += y;
+      }
+      
       public function clear() : void
       {
          this._debugger.text = "";
