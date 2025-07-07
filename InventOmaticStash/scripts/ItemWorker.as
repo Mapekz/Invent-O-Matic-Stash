@@ -842,6 +842,38 @@ package
          {
             switch(config.legendaryEffectsMatchMode)
             {
+               case MatchMode.NOT_EXACT:
+                  i = 1;
+                  while(i <= item.numLegendaryStars)
+                  {
+                     legMod = LegendaryMods.getLegendaryModName(desc,i);
+                     legMods.push(legMod);
+                     if(legMod == null)
+                     {
+                        if(config.debug)
+                        {
+                           Logger.get().info(item.text + " DOES NOT MATCH, effect not found on slot: " + i);
+                        }
+                        return false;
+                     }
+                     if(!config.legendaryEffects.some(function(element:*, index:int, arr:Array):Boolean
+                     {
+                        return legMod.indexOf(element) != -1;
+                     }))
+                     {
+                        if(config.debug)
+                        {
+                           Logger.get().info(item.text + " MATCHES, contains: " + legMod);
+                        }
+                        return true;
+                     }
+                     i++;
+                  }
+                  if(config.debug)
+                  {
+                     Logger.get().info(item.text + " DOES NOT MATCH, effects: " + legMods.join("/"));
+                  }
+                  return false;
                case MatchMode.EXACT:
                   i = 1;
                   while(i <= item.numLegendaryStars)
