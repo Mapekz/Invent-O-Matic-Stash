@@ -1671,6 +1671,7 @@ package
       {
          var delay:uint;
          var delayStep:uint;
+         var i:int;
          try
          {
             delay = initDelay;
@@ -1682,7 +1683,21 @@ package
                {
                   if(isItemMatchingConfig(inventory[i],config))
                   {
-                     if(ItemCardData.get(inventory[i].serverHandleID) == null && selectItemCardsQueue[inventory[i].serverHandleID] == null)
+                     if(ItemCardData.get(inventory[i].serverHandleID) != null)
+                     {
+                        if(config.debug)
+                        {
+                           Logger.get().info(ItemCardData.get(inventory[i].serverHandleID).itemCardEntries.length + " itemCardData exists for: " + inventory[i].text);
+                        }
+                     }
+                     else if(selectItemCardsQueue[inventory[i].serverHandleID] != null)
+                     {
+                        if(config.debug)
+                        {
+                           Logger.get().info("selectItemCardEntries already queued for: " + inventory[i].text);
+                        }
+                     }
+                     else
                      {
                         selectItemCardsQueue[inventory[i].serverHandleID] = true;
                         delay += delayStep;
@@ -1694,10 +1709,6 @@ package
                               Logger.get().info("Get itemCardData for: " + text + ", d:" + delay + "ms");
                            }
                         },delay,inventory[i].serverHandleID,inventory[i].text,delay);
-                     }
-                     else if(config.debug)
-                     {
-                        Logger.get().info(ItemCardData.get(inventory[i].serverHandleID).itemCardEntries.length + " itemCardData exists for: " + inventory[i].text);
                      }
                   }
                }
