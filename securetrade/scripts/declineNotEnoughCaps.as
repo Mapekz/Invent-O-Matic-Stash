@@ -2,7 +2,7 @@ package
 {
    import Shared.AS3.BCBasicMenuItem;
    
-   [Embed(source="/_assets/assets.swf", symbol="symbol281")]
+   [Embed(source="/_assets/assets.swf", symbol="symbol284")]
    public dynamic class declineNotEnoughCaps extends BCBasicMenuItem
    {
        

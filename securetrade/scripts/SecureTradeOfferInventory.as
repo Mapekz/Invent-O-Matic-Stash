@@ -10,7 +10,7 @@ package
    import scaleform.gfx.Extensions;
    import scaleform.gfx.TextFieldEx;
    
-   [Embed(source="/_assets/assets.swf", symbol="symbol334")]
+   [Embed(source="/_assets/assets.swf", symbol="symbol337")]
    public class SecureTradeOfferInventory extends SecureTradeInventory
    {
        
@@ -36,6 +36,8 @@ package
       private var m_CarryWeightMax:Number = 0;
       
       private var m_showTooltip:* = false;
+      
+      private var m_showDivisor:* = true;
       
       private var m_Currency:Number = 0;
       
@@ -204,6 +206,12 @@ package
       {
          this.m_showTooltip = param1;
          this.UpdateTooltipVisibility();
+      }
+      
+      public function set showDivisor(param1:Boolean) : void
+      {
+         this.m_showDivisor = param1;
+         this.redrawUIComponent();
       }
       
       public function set showCurrency(param1:Boolean) : void

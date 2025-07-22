@@ -7,7 +7,7 @@ package
    import scaleform.gfx.Extensions;
    import scaleform.gfx.TextFieldEx;
    
-   [Embed(source="/_assets/assets.swf", symbol="symbol194")]
+   [Embed(source="/_assets/assets.swf", symbol="symbol197")]
    public class ItemCard_ValueEntry extends ItemCard_Entry
    {
        

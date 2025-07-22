@@ -11,7 +11,7 @@ package
    import flash.text.TextFormat;
    import scaleform.gfx.TextFieldEx;
    
-   [Embed(source="/_assets/assets.swf", symbol="symbol180")]
+   [Embed(source="/_assets/assets.swf", symbol="symbol183")]
    public class OfferListEntry extends ItemListEntry
    {
       
@@ -162,12 +162,12 @@ package
       
       override public function SetEntryText(param1:Object, param2:String) : *
       {
+         var isWtInt:Boolean;
          var _loc3_:Object;
          var _loc4_:*;
          var _loc5_:*;
          var _loc6_:String;
          var _loc7_:*;
-         var isWtInt:Boolean;
          super.SetEntryText(param1,param2);
          try
          {

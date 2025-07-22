@@ -2,7 +2,7 @@ package
 {
    import Shared.AS3.SWFLoaderClip;
    
-   [Embed(source="/_assets/assets.swf", symbol="symbol173")]
+   [Embed(source="/_assets/assets.swf", symbol="symbol176")]
    public dynamic class CurrencyIconContainer_mc extends SWFLoaderClip
    {
        

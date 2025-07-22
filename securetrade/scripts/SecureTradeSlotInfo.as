@@ -11,7 +11,7 @@ package
    import scaleform.gfx.Extensions;
    import scaleform.gfx.TextFieldEx;
    
-   [Embed(source="/_assets/assets.swf", symbol="symbol341")]
+   [Embed(source="/_assets/assets.swf", symbol="symbol344")]
    public class SecureTradeSlotInfo extends BSUIComponent
    {
       

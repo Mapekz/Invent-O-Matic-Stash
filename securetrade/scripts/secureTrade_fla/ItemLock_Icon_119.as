@@ -2,12 +2,12 @@ package secureTrade_fla
 {
    import flash.display.MovieClip;
    
-   [Embed(source="/_assets/assets.swf", symbol="symbol301")]
-   public dynamic class ValueInputBG_46 extends MovieClip
+   [Embed(source="/_assets/assets.swf", symbol="symbol172")]
+   public dynamic class ItemLock_Icon_119 extends MovieClip
    {
        
       
-      public function ValueInputBG_46()
+      public function ItemLock_Icon_119()
       {
          super();
          addFrameScript(0,this.frame1,1,this.frame2);

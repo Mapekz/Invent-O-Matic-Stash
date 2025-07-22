@@ -2,7 +2,7 @@ package
 {
    import Shared.GlobalFunc;
    
-   [Embed(source="/_assets/assets.swf", symbol="symbol233")]
+   [Embed(source="/_assets/assets.swf", symbol="symbol236")]
    public class ItemCard_MultiEntry_Value extends ItemCard_Entry
    {
        

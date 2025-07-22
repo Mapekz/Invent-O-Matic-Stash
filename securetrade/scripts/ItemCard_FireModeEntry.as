@@ -1,6 +1,6 @@
 package
 {
-   [Embed(source="/_assets/assets.swf", symbol="symbol241")]
+   [Embed(source="/_assets/assets.swf", symbol="symbol244")]
    public class ItemCard_FireModeEntry extends ItemCard_Entry
    {
        
