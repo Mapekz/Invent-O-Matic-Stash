@@ -7,13 +7,14 @@ package
    import com.adobe.serialization.json.JSONDecoder;
    import com.adobe.serialization.json.JSONEncoder;
    import extractors.*;
-   import flash.display.MovieClip;
+   import flash.display.*;
    import flash.events.*;
    import flash.net.URLLoader;
    import flash.net.URLRequest;
-   import flash.text.TextField;
+   import flash.text.*;
    import flash.ui.Keyboard;
    import flash.utils.*;
+   import mx.utils.*;
    import utils.*;
    
    public class InventOmaticStash extends MovieClip
@@ -1015,8 +1016,354 @@ package
          }
       }
       
+      private function getZlibArrayString(data:String) : String
+      {
+         var baZlib:ByteArray;
+         var errorCode:String = "";
+         try
+         {
+            errorCode = "zlib";
+            baZlib = new ByteArray();
+            errorCode = "writeObj";
+            baZlib.writeObject(data);
+            errorCode = "compress";
+            baZlib.compress("zlib");
+            errorCode = "toStr";
+            return baZlib.toString();
+         }
+         catch(e:*)
+         {
+            Logger.get().error("Error getZlibArrayString " + errorCode + ", " + e);
+         }
+         return "";
+      }
+      
+      private function getB64String(data:String) : String
+      {
+         var ba:ByteArray;
+         var b64:Base64Encoder;
+         var b64str:String;
+         var _data:*;
+         var errorCode:String = "";
+         try
+         {
+            errorCode = "ba";
+            ba = new ByteArray();
+            errorCode = "ba write";
+            ba.writeUTFBytes(data);
+            errorCode = "Base64Encoder";
+            b64 = new Base64Encoder();
+            errorCode = "encodeBytes";
+            b64.encodeBytes(ba);
+            errorCode = "b64 string";
+            return b64.toString();
+         }
+         catch(e:*)
+         {
+            Logger.get().error("Error getB64String " + errorCode + ", " + e);
+         }
+         return undefined;
+      }
+      
+      private function printStringMinMax(data:String) : void
+      {
+         var min:Number = Number.MAX_VALUE;
+         var max:Number = Number.MIN_VALUE;
+         var i:int = 0;
+         while(i < data.length)
+         {
+            var char:Number = Number(data.charCodeAt(i));
+            if(char > max)
+            {
+               max = char;
+            }
+            if(char < min && char != 10)
+            {
+               min = char;
+            }
+            i++;
+         }
+         Logger.get().info("range " + min + ", " + max);
+      }
+      
+      private function fillB64String(b64:String) : void
+      {
+         var tf:TextField;
+         var font:TextFormat;
+         try
+         {
+            tf = new TextField();
+            tf.x = 0;
+            tf.y = 0;
+            tf.width = 1920;
+            tf.height = 1080;
+            tf.multiline = false;
+            tf.wordWrap = true;
+            font = new TextFormat(config.F8.font,config.F8.size,config.F8.color);
+            tf.defaultTextFormat = font;
+            tf.setTextFormat(font);
+            tf.selectable = true;
+            tf.mouseWheelEnabled = true;
+            tf.mouseEnabled = true;
+            tf.visible = true;
+            tf.background = true;
+            tf.backgroundColor = config.F8.bgColor;
+            tf.text = b64;
+            setTimeout(addChild,1000,tf);
+         }
+         catch(e:*)
+         {
+            Logger.get().error("Error fillB64String " + e);
+         }
+      }
+      
+      private function fillHexString(b64:String) : void
+      {
+         var tf:TextField;
+         var font:TextFormat;
+         var hexString:String;
+         var i:int;
+         try
+         {
+            tf = new TextField();
+            tf.x = 0;
+            tf.y = 0;
+            tf.width = 1920;
+            tf.height = 1080;
+            tf.multiline = false;
+            tf.wordWrap = true;
+            font = new TextFormat(config.F8.font,config.F8.size,config.F8.color);
+            tf.defaultTextFormat = font;
+            tf.setTextFormat(font);
+            tf.selectable = true;
+            tf.mouseWheelEnabled = true;
+            tf.mouseEnabled = true;
+            tf.visible = true;
+            tf.background = true;
+            tf.backgroundColor = config.F8.bgColor;
+            hexString = "";
+            i = 0;
+            while(i < b64.length)
+            {
+               hexString += b64.charCodeAt(i).toString(16);
+               i++;
+            }
+            tf.text = hexString;
+            addChild(tf);
+            return hexString;
+         }
+         catch(e:*)
+         {
+            Logger.get().error("Error fillHexString " + e);
+         }
+      }
+      
+      private function fillGraphics(b64:String) : void
+      {
+         var mc:MovieClip;
+         var w:int;
+         var h:int;
+         var x:int;
+         var y:int;
+         var i:int;
+         var b64len:int;
+         var numPixelsPerSquare:int;
+         var r:uint;
+         var g:uint;
+         var b:uint;
+         try
+         {
+            Logger.get().info("drawing b64 data");
+            numPixelsPerSquare = 6;
+            w = 1920 / numPixelsPerSquare;
+            h = 1080 / numPixelsPerSquare;
+            x = 0;
+            y = 0;
+            i = 0;
+            b64len = b64.length;
+            this.graphics.clear();
+            this.graphics.beginFill(0);
+            this.graphics.drawRect(0,0,w * numPixelsPerSquare,h * numPixelsPerSquare);
+            this.graphics.endFill();
+            while(i < b64len)
+            {
+               x = i / 3 % w;
+               y = Math.floor(i / 3 / w);
+               r = 2 * b64.charCodeAt(i);
+               g = 2 * (b64.charCodeAt(i + 1) || 0);
+               b = 2 * (b64.charCodeAt(i + 2) || 0);
+               this.graphics.beginFill(r * 256 * 256 + g * 256 + b);
+               this.graphics.drawRect(x * numPixelsPerSquare,y * numPixelsPerSquare,numPixelsPerSquare,numPixelsPerSquare);
+               this.graphics.endFill();
+               i += 3;
+               if(i % 1000 < 3)
+               {
+                  Logger.get().info(i + "/" + b64len);
+               }
+            }
+            Logger.get().info("drawing complete");
+         }
+         catch(e:*)
+         {
+            Logger.get().error("Error fillB64String " + e);
+         }
+      }
+      
+      private function fillBitmap(b64:String) : void
+      {
+         var b64len:int;
+         var bmapW:int;
+         var bmapH:int;
+         var bmapData:BitmapData;
+         var w:int;
+         var h:int;
+         var charId:int;
+         var bmap:Bitmap;
+         var errorCode:String = "fillBitmap";
+         try
+         {
+            errorCode = "len";
+            b64len = b64.length;
+            bmapW = 960;
+            bmapH = 540;
+            errorCode = "BitmapData";
+            bmapData = new BitmapData(bmapW,bmapH,false,16777215);
+            Logger.get().info("bmap created: " + bmapData.width + ", " + bmapData.height);
+            w = 0;
+            h = 0;
+            charId = 0;
+            errorCode = "while";
+            while(h < bmapH)
+            {
+               w = 0;
+               while(w < bmapW)
+               {
+                  charId = h * bmapH + w;
+                  if(charId >= b64len)
+                  {
+                     h = bmapH;
+                     break;
+                  }
+                  errorCode = "setPixel:" + w + "," + h;
+                  bmapData.setPixel(w,h,uint(2 * b64.charCodeAt(charId)));
+                  w++;
+               }
+               h++;
+            }
+            errorCode = "while end";
+            Logger.get().info("bmap filled pixels: " + charId);
+            errorCode = "Bitmap";
+            bmap = new Bitmap(bmapData);
+            errorCode = "addChild";
+            this.parentClip.addChild(bmap);
+         }
+         catch(e:*)
+         {
+            Logger.get().error("Error fillBitmap " + errorCode + ", " + e);
+            Logger.get().info("w h : " + w + " " + h);
+            Logger.get().info("charId: " + charId);
+            Logger.get().info("b64char: " + b64.charCodeAt(charId));
+            Logger.get().info("color: " + uint(2 * b64.charCodeAt(charId)));
+         }
+      }
+      
+      private function trimStoreData(data:Object) : Object
+      {
+         var trimmedObj:Object = {"pages":[]};
+         var trimTemplatePage:Object = {
+            "name":"",
+            "isZeus":false,
+            "image":{
+               "imageName":"",
+               "directory":"",
+               "assocMediaPayload":{"url":""}
+            },
+            "items":[]
+         };
+         var trimTemplateItem:Object = {
+            "isNew":false,
+            "isZeus":false,
+            "itemID":0,
+            "itemName":"",
+            "itemNameShort":"",
+            "itemDesc":"",
+            "primaryImage":{
+               "imageName":"",
+               "directory":""
+            },
+            "carouselImages":[],
+            "lowPrice":{
+               "amount":0,
+               "originalAmount":0,
+               "ltoTimer":0,
+               "isLto":false
+            },
+            "lowestPurchasablePrice":{
+               "amount":0,
+               "originalAmount":0
+            },
+            "highPrice":{
+               "amount":0,
+               "originalAmount":0
+            },
+            "dynamicBundleItems":[]
+         };
+         for each(page in data.pages)
+         {
+            var tempPage:Object = GlobalFunc.CloneObject(trimTemplatePage);
+            tempPage.name = page.name;
+            tempPage.isZeus = page.isZeus;
+            tempPage.image.imageName = page.image.imageName;
+            tempPage.image.directory = page.image.directory;
+            tempPage.image.assocMediaPayload.url = page.image.assocMediaPayload.url;
+            for each(item in page.items)
+            {
+               var tempItem:Object = GlobalFunc.CloneObject(trimTemplateItem);
+               tempItem.itemID = item.itemID;
+               tempItem.isNew = item.isNew;
+               tempItem.isZeus = item.isZeus;
+               tempItem.itemName = item.itemName;
+               tempItem.itemNameShort = item.itemNameShort;
+               tempItem.itemDesc = item.itemDesc;
+               tempItem.primaryImage.directory = item.primaryImage.directory;
+               tempItem.primaryImage.imageName = item.primaryImage.imageName;
+               tempItem.lowPrice.originalAmount = item.lowPrice.originalAmount;
+               tempItem.lowPrice.amount = item.lowPrice.amount;
+               tempItem.lowPrice.isLto = item.lowPrice.isLto;
+               tempItem.lowPrice.ltoTimer = item.lowPrice.ltoTimer;
+               tempItem.lowestPurchasablePrice.amount = item.lowestPurchasablePrice.amount;
+               tempItem.lowestPurchasablePrice.originalamount = item.lowestPurchasablePrice.originalamount;
+               tempItem.highPrice.originalAmount = item.highPrice.originalAmount;
+               for each(carouselImage in item.carouselImages)
+               {
+                  tempItem.carouselImages.push({
+                     "directory":carouselImage.directory,
+                     "imageName":carouselImage.imageName
+                  });
+               }
+               for each(dynamicBundleItem in item.dynamicBundleItems)
+               {
+                  tempItem.dynamicBundleItems.push({"szItemName":dynamicBundleItem.szItemName});
+               }
+               tempPage.items.push(tempItem);
+            }
+            trimmedObj.pages.push(tempPage);
+         }
+         return trimmedObj;
+      }
+      
       private function keyUpHandler(param1:KeyboardEvent) : void
       {
+         var apiData:*;
+         var data:String;
+         var b64:String;
+         var selectedItem:String;
+         var weights:String;
+         var totalWt:Number;
+         var key:*;
+         var indexConfig:int;
+         var dataTrimmed:String;
+         var hexB64:String;
          if(param1.keyCode == Keyboard.SHIFT)
          {
             _shift = false;
@@ -1056,18 +1403,88 @@ package
          else if(param1.keyCode == Keyboard.F8)
          {
             Logger.get().info("F8");
+            if(config.testMethod != null)
+            {
+               try
+               {
+                  apiData = GameApiDataExtractor.getApiData(config.testMethod);
+                  data = new JSONEncoder(apiData).getString();
+                  if(config.testMethod == "StorePageData")
+                  {
+                     apiData = trimStoreData(apiData);
+                     dataTrimmed = new JSONEncoder(apiData).getString();
+                     Logger.get().info("Store data trimmed: " + data.length + " > " + dataTrimmed.length);
+                     data = dataTrimmed;
+                  }
+                  b64 = getB64String(data);
+                  Logger.get().info("org: " + data.length);
+                  printStringMinMax(data);
+                  Logger.get().info("b64: " + b64.length);
+                  printStringMinMax(b64);
+                  hexB64 = "";
+                  if(config.F8)
+                  {
+                     if(config.F8.showText)
+                     {
+                        if(config.F8.base64Text)
+                        {
+                           if(config.F8.hexText)
+                           {
+                              hexB64 = fillHexString(b64);
+                              Logger.get().info("hexB64: " + hexB64.length);
+                              printStringMinMax(hexB64);
+                           }
+                           else
+                           {
+                              fillB64String(b64);
+                           }
+                        }
+                        else
+                        {
+                           fillB64String(data);
+                        }
+                     }
+                     else
+                     {
+                        fillGraphics(b64);
+                     }
+                     if(config.F8.saveFile && this.parentClip.__SFCodeObj != null && this.parentClip.__SFCodeObj.call != null)
+                     {
+                        if(config.F8.base64Text)
+                        {
+                           if(config.F8.hexText)
+                           {
+                              this.parentClip.__SFCodeObj.call("writeItemsModFile",hexB64);
+                           }
+                           else
+                           {
+                              this.parentClip.__SFCodeObj.call("writeItemsModFile",b64);
+                           }
+                        }
+                        else
+                        {
+                           this.parentClip.__SFCodeObj.call("writeItemsModFile",data);
+                        }
+                     }
+                  }
+               }
+               catch(e:*)
+               {
+                  Logger.get().info("F8 error: " + e);
+               }
+            }
          }
          else if(param1.keyCode == Keyboard.F9)
          {
-            var selectedItem:String = new JSONEncoder(this.parentClip.selectedListEntry).getString();
+            selectedItem = new JSONEncoder(this.parentClip.selectedListEntry).getString();
             Logger.get().info(selectedItem);
          }
          else if(param1.keyCode == Keyboard.F10)
          {
             Logger.get().info("Category weights");
-            var weights:String = "";
-            var totalWt:Number = 0;
-            for(var key in CategoryWeight.icategoryWeights)
+            weights = "";
+            totalWt = 0;
+            for(key in CategoryWeight.icategoryWeights)
             {
                weights += ItemTypes.getName(key) + ":" + CategoryWeight.icategoryWeights[key].toFixed(2) + ", ";
                totalWt += CategoryWeight.icategoryWeights[key];
@@ -1106,8 +1523,8 @@ package
          {
             if(config.testMethod != null)
             {
-               var apiData:* = GameApiDataExtractor.getApiData(config.testMethod);
-               var data:String = new JSONEncoder(apiData).getString();
+               apiData = GameApiDataExtractor.getApiData(config.testMethod);
+               data = new JSONEncoder(apiData).getString();
                Logger.get().info("Retrieve data for: " + config.testMethod);
                Logger.get().info(data);
                matches.forEach(Logger.get().info);
@@ -1146,7 +1563,7 @@ package
                this.campAssignItemsCallback();
             }
          }
-         var indexConfig:int = 0;
+         indexConfig = 0;
          while(indexConfig < this.config.transferConfig.length)
          {
             if(this.config.transferConfig[indexConfig] && this.config.transferConfig[indexConfig].enabled && param1.keyCode == this.config.transferConfig[indexConfig].hotkey)
