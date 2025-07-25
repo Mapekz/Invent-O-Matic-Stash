@@ -213,6 +213,16 @@ package extractors
                            line[j] = this._extractConfig.customFormat.valueNotFound;
                         }
                         break;
+                     case "weaponType":
+                        if(inventory[i].filterFlag & 4)
+                        {
+                           line[j] = WeaponTypes.getWeaponType(inventory[i]) || this._extractConfig.customFormat.valueNotFound;
+                        }
+                        else
+                        {
+                           line[j] = this._extractConfig.customFormat.valueNotFound;
+                        }
+                        break;
                   }
                }
                outputObject[outputObjectLine++] = line.join(this._extractConfig.customFormat.delimiter);

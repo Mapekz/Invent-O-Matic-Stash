@@ -715,6 +715,10 @@ package
             {
                index++;
             }
+            else if(item.filterFlag & 4 && sectionConfig.weaponTypes is Array && sectionConfig.weaponTypes.length > 0 && sectionConfig.weaponTypes.indexOf(WeaponTypes.getWeaponType(item)) == -1)
+            {
+               index++;
+            }
             else
             {
                if(transferTaggedForSearch && item.taggedForSearch)
