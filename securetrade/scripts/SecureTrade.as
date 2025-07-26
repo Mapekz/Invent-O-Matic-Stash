@@ -2494,7 +2494,7 @@ package
                _loc6_ = Math.min(this.selectedListEntry.count,Math.floor(_loc5_ / _loc2_));
                if(this.selectedList == this.PlayerInventory_mc && this.isMaxCurrencyProtection())
                {
-                  return Math.min(Math.floor((this.PlayerInventory_mc.currencyMax - playerCurrency) / _loc2_),_loc6_);
+                  return Math.min(Math.floor((this.PlayerInventory_mc.currencyMax - _loc4_) / _loc2_),_loc6_);
                }
             }
          }
