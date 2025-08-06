@@ -5,7 +5,6 @@ package secureTrade_fla
    [Embed(source="/_assets/assets.swf", symbol="symbol65")]
    public dynamic class MeterClip_102 extends MovieClip
    {
-       
       
       public function MeterClip_102()
       {
@@ -19,3 +18,4 @@ package secureTrade_fla
       }
    }
 }
+

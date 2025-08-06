@@ -5,7 +5,6 @@ package secureTrade_fla
    [Embed(source="/_assets/assets.swf", symbol="symbol190")]
    public dynamic class ItemCard_Comparison_73 extends MovieClip
    {
-       
       
       public function ItemCard_Comparison_73()
       {
@@ -19,3 +18,4 @@ package secureTrade_fla
       }
    }
 }
+

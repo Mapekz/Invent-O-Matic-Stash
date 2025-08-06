@@ -5,7 +5,6 @@ package
    [Embed(source="/_assets/assets.swf", symbol="symbol28")]
    public dynamic class modalUpgradeStash extends BCBasicModal
    {
-       
       
       public function modalUpgradeStash()
       {
@@ -29,3 +28,4 @@ package
       }
    }
 }
+

@@ -5,7 +5,6 @@ package secureTrade_fla
    [Embed(source="/_assets/assets.swf", symbol="symbol165")]
    public dynamic class colorConditionMeter_101 extends MovieClip
    {
-       
       
       public var MeterClip_mc:MovieClip;
       
@@ -21,3 +20,4 @@ package secureTrade_fla
       }
    }
 }
+

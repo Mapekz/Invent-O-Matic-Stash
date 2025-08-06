@@ -29,7 +29,6 @@ package
       public static const COLUMN_STACK_WEIGHT:String = "STACK_WEIGHT";
       
       public static const COLUMN_VALUE_PER_WEIGHT:String = "VALUE_PER_WEIGHT";
-       
       
       public var ItemList_mc:MenuListComponent;
       
@@ -138,3 +137,4 @@ package
       }
    }
 }
+

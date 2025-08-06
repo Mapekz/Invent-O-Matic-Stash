@@ -5,7 +5,6 @@ package secureTrade_fla
    [Embed(source="/_assets/assets.swf", symbol="symbol58")]
    public dynamic class questItemIcon_mc_114 extends MovieClip
    {
-       
       
       public function questItemIcon_mc_114()
       {
@@ -19,3 +18,4 @@ package secureTrade_fla
       }
    }
 }
+

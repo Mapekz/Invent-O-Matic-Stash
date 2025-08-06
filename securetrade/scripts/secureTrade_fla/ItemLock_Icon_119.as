@@ -5,7 +5,6 @@ package secureTrade_fla
    [Embed(source="/_assets/assets.swf", symbol="symbol172")]
    public dynamic class ItemLock_Icon_119 extends MovieClip
    {
-       
       
       public function ItemLock_Icon_119()
       {
@@ -24,3 +23,4 @@ package secureTrade_fla
       }
    }
 }
+

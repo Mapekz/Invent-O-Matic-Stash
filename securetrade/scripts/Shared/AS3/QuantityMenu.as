@@ -40,7 +40,6 @@ package Shared.AS3
       public static const MAX:String = "QuantityMenu::quantityMaxed";
       
       public static const CANCEL:String = "QuantityMenu::quantityCancelled";
-       
       
       public var Label_tf:TextField;
       
@@ -707,3 +706,4 @@ package Shared.AS3
       }
    }
 }
+

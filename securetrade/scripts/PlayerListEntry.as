@@ -26,7 +26,6 @@ package
       private static const CONDITION_SPACING:Number = 6;
       
       public static var ShowAdditionalColumns:Object = null;
-       
       
       public var Price_tf:TextField;
       
@@ -62,7 +61,6 @@ package
       
       public function PlayerListEntry()
       {
-         this.m_LastCurrencyType = 4294967295;
          super();
          if(this.RequestedTextField)
          {
@@ -340,3 +338,4 @@ package
       }
    }
 }
+

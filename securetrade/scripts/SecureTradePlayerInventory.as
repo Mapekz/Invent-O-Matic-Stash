@@ -12,7 +12,6 @@ package
    [Embed(source="/_assets/assets.swf", symbol="symbol332")]
    public class SecureTradePlayerInventory extends SecureTradeInventory
    {
-       
       
       public var Tooltip_mc:MovieClip;
       
@@ -273,3 +272,4 @@ package
       }
    }
 }
+

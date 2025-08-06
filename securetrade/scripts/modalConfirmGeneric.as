@@ -5,7 +5,6 @@ package
    [Embed(source="/_assets/assets.swf", symbol="symbol315")]
    public dynamic class modalConfirmGeneric extends BCBasicModal
    {
-       
       
       public function modalConfirmGeneric()
       {
@@ -29,3 +28,4 @@ package
       }
    }
 }
+

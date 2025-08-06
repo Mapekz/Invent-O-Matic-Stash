@@ -16,7 +16,6 @@ package
       private static const DEFAULT_LABEL_BUFFER_X:Number = 8.35;
       
       private static const DEFAULT_LABEL_OFFSET_Y:Number = 4;
-       
       
       private var DisplayText:String;
       
@@ -131,3 +130,4 @@ package
       }
    }
 }
+

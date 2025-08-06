@@ -5,7 +5,6 @@ package secureTrade_fla
    [Embed(source="/_assets/assets.swf", symbol="symbol301")]
    public dynamic class ValueInputBG_46 extends MovieClip
    {
-       
       
       public function ValueInputBG_46()
       {
@@ -24,3 +23,4 @@ package secureTrade_fla
       }
    }
 }
+

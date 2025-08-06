@@ -5,7 +5,6 @@ package
    [Embed(source="/_assets/assets.swf", symbol="symbol284")]
    public dynamic class declineNotEnoughCaps extends BCBasicMenuItem
    {
-       
       
       public function declineNotEnoughCaps()
       {
@@ -24,3 +23,4 @@ package
       }
    }
 }
+

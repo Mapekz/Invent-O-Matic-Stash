@@ -13,7 +13,6 @@ package
    [Embed(source="/_assets/assets.swf", symbol="symbol337")]
    public class SecureTradeOfferInventory extends SecureTradeInventory
    {
-       
       
       public var Tooltip_mc:MovieClip;
       
@@ -45,7 +44,6 @@ package
       
       public function SecureTradeOfferInventory()
       {
-         this.m_menuMode = 4294967295;
          super();
          this.Tooltip_mc.Tooltip_tf.text = "";
          this.miniTooltip_mc.textField_tf.text = "";
@@ -405,3 +403,4 @@ package
       }
    }
 }
+

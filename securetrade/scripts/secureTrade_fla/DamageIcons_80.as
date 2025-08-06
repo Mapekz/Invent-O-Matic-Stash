@@ -5,7 +5,6 @@ package secureTrade_fla
    [Embed(source="/_assets/assets.swf", symbol="symbol235")]
    public dynamic class DamageIcons_80 extends MovieClip
    {
-       
       
       public function DamageIcons_80()
       {
@@ -19,3 +18,4 @@ package secureTrade_fla
       }
    }
 }
+

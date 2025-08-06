@@ -5,7 +5,6 @@ package secureTrade_fla
    [Embed(source="/_assets/assets.swf", symbol="symbol251")]
    public dynamic class icon_durability_76 extends MovieClip
    {
-       
       
       public function icon_durability_76()
       {
@@ -19,3 +18,4 @@ package secureTrade_fla
       }
    }
 }
+

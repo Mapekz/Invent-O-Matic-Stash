@@ -6,7 +6,6 @@ package
    
    public class ItemCard_DescriptionEntry extends ItemCard_Entry
    {
-       
       
       public var Background_mc:MovieClip;
       
@@ -46,3 +45,4 @@ package
       }
    }
 }
+

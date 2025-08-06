@@ -5,7 +5,6 @@ package secureTrade_fla
    [Embed(source="/_assets/assets.swf", symbol="symbol44")]
    public dynamic class RarityIndicator_109 extends MovieClip
    {
-       
       
       public function RarityIndicator_109()
       {
@@ -39,3 +38,4 @@ package secureTrade_fla
       }
    }
 }
+

@@ -18,7 +18,6 @@ package
       public static const ROWS:Number = 2;
       
       public static const COLUMNS:Number = 3;
-       
       
       public var DeclineButtons_mc:MovieClip;
       
@@ -138,3 +137,4 @@ package
       }
    }
 }
+

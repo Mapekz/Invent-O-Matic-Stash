@@ -9,7 +9,6 @@ package
    [Embed(source="/_assets/assets.swf", symbol="symbol30")]
    public class ScrapComponentListEntry extends BSScrollingListEntry
    {
-       
       
       public function ScrapComponentListEntry()
       {
@@ -59,3 +58,4 @@ package
       }
    }
 }
+

@@ -5,7 +5,6 @@ package secureTrade_fla
    [Embed(source="/_assets/assets.swf", symbol="symbol358")]
    public dynamic class ItemCardContainer_4 extends MovieClip
    {
-       
       
       public var Background_mc:MovieClip;
       
@@ -28,3 +27,4 @@ package secureTrade_fla
       }
    }
 }
+

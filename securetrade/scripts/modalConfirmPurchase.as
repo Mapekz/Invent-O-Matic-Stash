@@ -5,7 +5,6 @@ package
    [Embed(source="/_assets/assets.swf", symbol="symbol314")]
    public dynamic class modalConfirmPurchase extends BCBasicModal
    {
-       
       
       public function modalConfirmPurchase()
       {
@@ -29,3 +28,4 @@ package
       }
    }
 }
+

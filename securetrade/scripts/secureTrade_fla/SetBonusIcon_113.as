@@ -5,7 +5,6 @@ package secureTrade_fla
    [Embed(source="/_assets/assets.swf", symbol="symbol55")]
    public dynamic class SetBonusIcon_113 extends MovieClip
    {
-       
       
       public function SetBonusIcon_113()
       {
@@ -24,3 +23,4 @@ package secureTrade_fla
       }
    }
 }
+

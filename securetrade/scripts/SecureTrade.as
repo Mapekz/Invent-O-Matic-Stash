@@ -199,7 +199,6 @@ package
       public static const HEIGHT_BUFFER:uint = 250;
       
       public static var Instance:* = null;
-       
       
       public var ButtonHintBar_mc:BSButtonHintBar;
       
@@ -265,7 +264,7 @@ package
       
       private var ShowHistoryButton:BSButtonHintData;
       
-      private var ButtonHintDataV:Vector.<BSButtonHintData>;
+      private var ButtonHintDataV:Vector.<BSButtonHintData> = new <BSButtonHintData>[this.AcceptButton,this.DeclineItemAcceptButton,this.DeclineItemCancelButton,this.ButtonDecline,this.ButtonToggleAssign,this.ScrapButton,this.InspectButton,this.ButtonPlayerInventory,this.ButtonContainerInventory,this.StoreUnusedItemsButton,this.TakeAllButton,this.SortButton,this.ButtonOffersOnly,this.ToggleShowMarkedItemsOnlyButton,this.ShowHistoryButton,this.ExitButton];
       
       private const NO_FILTER_ID:int = -1;
       
@@ -361,7 +360,7 @@ package
       
       private var m_onlyTakingAllowed:Boolean = false;
       
-      private var m_SortFieldText:Array;
+      private var m_SortFieldText:Array = ["$SORT","$SORT_DMG","$SORT_ROF","$SORT_RNG","$SORT_ACC","$SORT_VAL","$SORT_WT","$SORT_SW","$SORT_SPL"];
       
       private var m_PlayerInventorySortField:int = 0;
       
@@ -383,15 +382,15 @@ package
       
       private var m_ToolTipDefaultHeight:Number;
       
-      private var m_MyOffersData:Array;
+      private var m_MyOffersData:Array = new Array();
       
-      private var m_TheirOffersData:Array;
+      private var m_TheirOffersData:Array = new Array();
       
-      private var m_PlayerInvData:Array;
+      private var m_PlayerInvData:Array = new Array();
       
-      private var m_OtherInvData:Array;
+      private var m_OtherInvData:Array = new Array();
       
-      private var m_NewItems:Array;
+      private var m_NewItems:Array = new Array();
       
       private var m_ShowOffersOnly:Boolean = false;
       
@@ -441,13 +440,10 @@ package
       
       public var modLoader:Loader;
       
-      public var __SFCodeObj:Object;
+      public var __SFCodeObj:Object = new Object();
       
       public function SecureTrade()
       {
-         this.m_MenuMode = 4294967295;
-         this.m_CurrencyType = 4294967295;
-         this.__SFCodeObj = new Object();
          this.ButtonPlayerInventory = new BSButtonHintData("$TransferPlayerLabel","LT","PSN_L2_Alt","Xenon_L2_Alt",1,this.onSwapInventoryPlayer);
          this.ButtonContainerInventory = new BSButtonHintData("$TransferContainerLabel","RT","PSN_R2_Alt","Xenon_R2_Alt",1,this.onSwapInventoryContainer);
          this.ButtonDecline = new BSButtonHintData("$DECLINEITEM","R","PSN_X","Xenon_X",1,this.onDeclineItem);
@@ -464,13 +460,6 @@ package
          this.DeclineItemCancelButton = new BSButtonHintData("$CANCEL","TAB","PSN_B","Xenon_B",1,this.onBackButton);
          this.ToggleShowMarkedItemsOnlyButton = new BSButtonHintData("","T","PSN_Y","Xenon_Y",1,this.onToggleShowMarkedItemsOnlyButton);
          this.ShowHistoryButton = new BSButtonHintData("$CAMP_SLOTS_VENDING_HISTORY","V","PSN_Select","Xenon_Select",1,this.onShowHistory);
-         this.ButtonHintDataV = new <BSButtonHintData>[this.AcceptButton,this.DeclineItemAcceptButton,this.DeclineItemCancelButton,this.ButtonDecline,this.ButtonToggleAssign,this.ScrapButton,this.InspectButton,this.ButtonPlayerInventory,this.ButtonContainerInventory,this.StoreUnusedItemsButton,this.TakeAllButton,this.SortButton,this.ButtonOffersOnly,this.ToggleShowMarkedItemsOnlyButton,this.ShowHistoryButton,this.ExitButton];
-         this.m_SortFieldText = ["$SORT","$SORT_DMG","$SORT_ROF","$SORT_RNG","$SORT_ACC","$SORT_VAL","$SORT_WT","$SORT_SW","$SORT_SPL"];
-         this.m_MyOffersData = new Array();
-         this.m_TheirOffersData = new Array();
-         this.m_PlayerInvData = new Array();
-         this.m_OtherInvData = new Array();
-         this.m_NewItems = new Array();
          super();
          addFrameScript(0,this.frame1,31,this.frame32,48,this.frame49,58,this.frame59,68,this.frame69);
          this.ButtonHintBar_mc.useVaultTecColor = true;
@@ -1311,7 +1300,7 @@ package
          {
             this.closeConfirmPurchaseModal(true);
             _loc2_ = Math.min(this.selectedListEntry.count,this.ModalSetQuantity_mc.quantity);
-            _loc3_ = !!this.selectedListEntry.isOffered ? Number(this.selectedListEntry.offerValue) : Number(this.selectedListEntry.itemValue);
+            _loc3_ = this.selectedListEntry.isOffered ? Number(this.selectedListEntry.offerValue) : Number(this.selectedListEntry.itemValue);
             if(this.m_MenuMode == MODE_NPCVENDING)
             {
                BSUIDataManager.dispatchEvent(new CustomEvent(this.selectedList == this.PlayerInventory_mc ? EVENT_NPC_SELL_ITEM : EVENT_NPC_BUY_ITEM,{
@@ -2364,7 +2353,7 @@ package
             this.ModalConfirmPurchase_mc.header = "$CONFIRMSALE";
          }
          var _loc2_:Number = Math.min(this.selectedListEntry.count,this.ModalSetQuantity_mc.quantity);
-         var _loc3_:Number = !!this.selectedListEntry.isOffered ? Number(this.selectedListEntry.offerValue) : Number(this.selectedListEntry.itemValue);
+         var _loc3_:Number = this.selectedListEntry.isOffered ? Number(this.selectedListEntry.offerValue) : Number(this.selectedListEntry.itemValue);
          this.ModalConfirmPurchase_mc.value = (_loc3_ * _loc2_).toString();
          var _loc4_:String = this.selectedListEntry.text;
          this.ModalConfirmPurchase_mc.tooltip = "";
@@ -2468,7 +2457,7 @@ package
          var _loc3_:Number = this.OfferInventory_mc.currency;
          var _loc4_:Number = this.PlayerInventory_mc.currency;
          var _loc5_:Number = this.selectedList == this.PlayerInventory_mc ? _loc3_ : _loc4_;
-         var _loc6_:Number = !!this.selectedListEntry ? Number(this.selectedListEntry.count) : 1;
+         var _loc6_:Number = this.selectedListEntry ? Number(this.selectedListEntry.count) : 1;
          if(param1)
          {
             if(!this.m_OwnsVendor && this.m_MenuMode == MODE_PLAYERVENDING && Boolean(this.selectedListEntry.isOffered))
@@ -2945,7 +2934,7 @@ package
             this.ButtonPlayerInventory.ButtonVisible = uiController != PlatformChangeEvent.PLATFORM_PC_KB_MOUSE && this.OfferInventory_mc.Active && !this.m_onlyGivingAllowed && !this.m_onlyTakingAllowed && !this.m_isWorkbench && !this.m_PlayerInventoryEmpty;
             this.ButtonContainerInventory.ButtonVisible = uiController != PlatformChangeEvent.PLATFORM_PC_KB_MOUSE && this.PlayerInventory_mc.Active && !this.m_onlyGivingAllowed && !this.m_onlyTakingAllowed && !this.m_isWorkbench && !this.m_ContainerEmpty;
             this.SortButton.ButtonVisible = true;
-            this.SortButton.ButtonText = this.m_SortFieldText[!!_loc3_ ? this.m_PlayerInventorySortField : this.m_OfferInventorySortField];
+            this.SortButton.ButtonText = this.m_SortFieldText[_loc3_ ? this.m_PlayerInventorySortField : this.m_OfferInventorySortField];
             this.ExitButton.ButtonVisible = true;
             this.ShowHistoryButton.ButtonVisible = this.m_OwnsVendor && !(this.m_MenuMode == MODE_ALLY || this.m_MenuMode == MODE_DISPLAY_CASE || this.m_MenuMode == MODE_FERMENTER || this.m_MenuMode == MODE_FREEZER || this.m_MenuMode == MODE_NPCVENDING || this.m_MenuMode == MODE_PET || this.m_MenuMode == MODE_RECHARGER || this.m_MenuMode == MODE_REFRIGERATOR);
             this.InspectButton.ButtonDisabled = this.selectedList == null || _loc2_ == null;
@@ -3035,7 +3024,7 @@ package
                   if(this.AcceptButton.ButtonVisible)
                   {
                      this.AcceptButton.ButtonDisabled = !_loc4_ && (this.m_VendorSellOnly || this.isItemProtected(this.selectedListEntry,true));
-                     this.AcceptButton.ButtonText = !!_loc4_ ? "$BUY" : "$SELL";
+                     this.AcceptButton.ButtonText = _loc4_ ? "$BUY" : "$SELL";
                   }
                   this.TakeAllButton.ButtonVisible = false;
                   this.ButtonOffersOnly.ButtonVisible = false;
@@ -3049,7 +3038,7 @@ package
                      this.AcceptButton.ButtonDisabled = _loc4_ && _loc2_.isTradable == false;
                      if(_loc4_)
                      {
-                        this.AcceptButton.ButtonText = !!_loc2_.isOffered ? "$BUY" : (!!_loc2_.isRequested ? "$CANCEL" : "$REQUEST");
+                        this.AcceptButton.ButtonText = _loc2_.isOffered ? "$BUY" : (_loc2_.isRequested ? "$CANCEL" : "$REQUEST");
                      }
                      else
                      {
@@ -3078,7 +3067,7 @@ package
                      this.AcceptButton.ButtonDisabled = false;
                      if(this.m_OwnsVendor)
                      {
-                        this.AcceptButton.ButtonText = !!_loc4_ ? this.m_AcceptBtnText_Container : "$SELL";
+                        this.AcceptButton.ButtonText = _loc4_ ? this.m_AcceptBtnText_Container : "$SELL";
                      }
                      else
                      {
@@ -3111,7 +3100,7 @@ package
                   if(this.AcceptButton.ButtonVisible)
                   {
                      this.AcceptButton.ButtonDisabled = this.m_ProcessingItemEvent;
-                     this.AcceptButton.ButtonText = !!_loc4_ ? this.m_AcceptBtnText_Container : this.m_AcceptBtnText_Player_Assign;
+                     this.AcceptButton.ButtonText = _loc4_ ? this.m_AcceptBtnText_Container : this.m_AcceptBtnText_Player_Assign;
                   }
                   this.TakeAllButton.ButtonVisible = false;
                   this.ButtonOffersOnly.ButtonVisible = false;
@@ -3980,3 +3969,4 @@ package
       }
    }
 }
+

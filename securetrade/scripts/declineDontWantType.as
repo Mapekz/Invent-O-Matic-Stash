@@ -5,7 +5,6 @@ package
    [Embed(source="/_assets/assets.swf", symbol="symbol280")]
    public dynamic class declineDontWantType extends BCBasicMenuItem
    {
-       
       
       public function declineDontWantType()
       {
@@ -24,3 +23,4 @@ package
       }
    }
 }
+

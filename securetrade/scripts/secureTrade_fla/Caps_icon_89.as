@@ -5,7 +5,6 @@ package secureTrade_fla
    [Embed(source="/_assets/assets.swf", symbol="symbol217")]
    public dynamic class Caps_icon_89 extends MovieClip
    {
-       
       
       public function Caps_icon_89()
       {
@@ -54,3 +53,4 @@ package secureTrade_fla
       }
    }
 }
+

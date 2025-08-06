@@ -22,7 +22,6 @@ package
       public static const LABEL_SELECTOR_FINALIZED_EVENT:String = "LabelSelectorFinalizedEvent";
       
       private static const MAX_LABEL_WIDTH:uint = 114;
-       
       
       public var Slider_mc:MovieClip;
       
@@ -52,7 +51,7 @@ package
       
       private var SelectedIndex:uint = 4294967295;
       
-      private var LabelClass:Class;
+      private var LabelClass:Class = LabelItem;
       
       private var TotalWidth:Number = 0;
       
@@ -64,9 +63,9 @@ package
       
       private var ButtonHintDataRightV:Vector.<BSButtonHintData>;
       
-      private var LBButtonData:BSButtonHintData;
+      private var LBButtonData:BSButtonHintData = new BSButtonHintData("","Z","PSN_L1","Xenon_L1",1,null);
       
-      private var RBButtonData:BSButtonHintData;
+      private var RBButtonData:BSButtonHintData = new BSButtonHintData("","C","PSN_R1","Xenon_R1",1,null);
       
       private var LastSliderX:* = 0;
       
@@ -102,9 +101,6 @@ package
       
       public function LabelSelector()
       {
-         this.LabelClass = LabelItem;
-         this.LBButtonData = new BSButtonHintData("","Z","PSN_L1","Xenon_L1",1,null);
-         this.RBButtonData = new BSButtonHintData("","C","PSN_R1","Xenon_R1",1,null);
          super();
          this.m_CenterPointOffset = this.BackerBar_mc.width / 2;
          this.Slider_mc = new MovieClip();
@@ -561,8 +557,8 @@ package
             this.LabelsA[this.SelectedIndex].selected = true;
          }
          this.SetLeftIndex(this.GetLeftIndex(this.SelectedIndex),param3);
-         var _loc5_:Object;
-         (_loc5_ = new Object()).Text = this.LabelsA[param1].text;
+         var _loc5_:Object = new Object();
+         _loc5_.Text = this.LabelsA[param1].text;
          _loc5_.ID = this.LabelsA[param1].id;
          _loc5_.Source = this;
          _loc5_.HandleSelectionImmediately = param2;
@@ -714,3 +710,4 @@ package
       }
    }
 }
+
