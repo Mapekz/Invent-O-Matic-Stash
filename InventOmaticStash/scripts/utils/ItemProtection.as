@@ -34,6 +34,27 @@ package utils
          return _protectionReason;
       }
       
+      public static function isValidLockConfig(config:Object) : Boolean
+      {
+         if(!config || !config.itemLocking || !config.itemLocking.enabled)
+         {
+            return false;
+         }
+         if(config.saleProtection && config.saleProtection.enabled)
+         {
+            return true;
+         }
+         if(config.scrapProtection && config.scrapProtection.enabled)
+         {
+            return true;
+         }
+         if(config.transferProtection && config.transferProtection.enabled)
+         {
+            return true;
+         }
+         return false;
+      }
+      
       public static function isProtected(item:Object, config:Object) : Boolean
       {
          _protectionReason = "";

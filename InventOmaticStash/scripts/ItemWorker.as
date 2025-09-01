@@ -432,7 +432,7 @@ package
       
       private function get _queueValid() : Boolean
       {
-         return _queue && _queueIndex < _queue.length && _queue[_queueIndex];
+         return Boolean(_queue) && _queueIndex < _queue.length && Boolean(_queue[_queueIndex]);
       }
       
       private function get _stashInventory() : Array
@@ -1140,7 +1140,7 @@ package
             Logger.get().info("Transferring: " + _queue[_queueIndex].text + " (" + _queue[_queueIndex].count + ")");
          }
          GameApiDataExtractor.transferItem(_queue[_queueIndex],_queue[_queueIndex].fromContainer,_queue[_queueIndex].count);
-         _queueIndex++;
+         ++_queueIndex;
       }
       
       private function getAmount(configAmount:int, itemCount:int, alreadyTransferred:int = 0) : int
@@ -1304,7 +1304,7 @@ package
             Logger.get().info("Scrapping: " + _queue[_queueIndex].text + " (" + _queue[_queueIndex].count + ")");
          }
          GameApiDataExtractor.scrapItem(_queue[_queueIndex]);
-         _queueIndex++;
+         ++_queueIndex;
       }
       
       private function npcSell(param1:Object) : void
@@ -1472,7 +1472,7 @@ package
             Logger.get().info("Selling: " + _queue[_queueIndex].text + " (" + _queue[_queueIndex].count + ")");
          }
          GameApiDataExtractor.sellItem(_queue[_queueIndex]);
-         _queueIndex++;
+         ++_queueIndex;
       }
       
       private function performContainerWeightCheck(param1:Object, param2:uint, param3:Object) : Boolean
@@ -2122,7 +2122,7 @@ package
          {
             GameApiDataExtractor.campBuyItem(_queue[_queueIndex].serverHandleID,_queue[_queueIndex].count,_queue[_queueIndex].price);
          }
-         _queueIndex++;
+         ++_queueIndex;
       }
       
       public function vendorBuyItems() : void
@@ -2161,6 +2161,22 @@ package
          else
          {
             Logger.get().error("Invalid campAssign config");
+         }
+      }
+      
+      public function lockProtectedItems() : void
+      {
+         if(ItemProtection.isValidLockConfig(_config.protectionConfig))
+         {
+            if(_config.protectionConfig.debug)
+            {
+               Logger.get().info("Valid lock config");
+            }
+            this.lockItems(_config.protectionConfig);
+         }
+         else
+         {
+            Logger.get().error("Invalid lock config");
          }
       }
    }

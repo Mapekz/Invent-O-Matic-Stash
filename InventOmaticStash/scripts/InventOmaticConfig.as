@@ -45,6 +45,8 @@ package
       
       private static var campAssignKeyCode:uint = 85;
       
+      private static var lockAllKeyCode:uint = 78;
+      
       private static var calculateCatWeightKeyCode:uint = 116;
       
       private static var swapToPlayerInventoryHotkey:uint = 0;
@@ -99,6 +101,11 @@ package
       public static function get CampAssignKeyCode() : uint
       {
          return campAssignKeyCode;
+      }
+      
+      public static function get LockAllKeyCode() : uint
+      {
+         return lockAllKeyCode;
       }
       
       public static function get CalculateCatWeightKeyCode() : uint
@@ -202,6 +209,10 @@ package
             lootKeyCode = Parser.parseHotkey(config.lootConfig,lootKeyCode);
             npcSellKeyCode = Parser.parseHotkey(config.npcSellConfig,npcSellKeyCode);
             campAssignKeyCode = Parser.parseHotkey(config.campAssignConfig,campAssignKeyCode);
+            if(config.protectionConfig)
+            {
+               lockAllKeyCode = Parser.parseHotkey(config.protectionConfig.itemLocking,lockAllKeyCode);
+            }
             buyKeyCode = Parser.parseHotkey(config.buyConfig,buyKeyCode);
             calculateCatWeightKeyCode = Parser.parseHotkey(config.categoryWeightConfig,calculateCatWeightKeyCode);
             for(var c in config.transferConfig)

@@ -54,6 +54,8 @@ package
       
       public var campAssignItemsButton:BSButtonHintData;
       
+      public var lockItemsButton:BSButtonHintData;
+      
       public var buttonHintBar:BSButtonHintBar;
       
       private var _shift:Boolean = false;
@@ -184,7 +186,7 @@ package
       
       public function get isMaxCurrencyProtection() : Boolean
       {
-         return this.config && this.config.protectionConfig && this.config.protectionConfig.saleProtection && this.config.protectionConfig.saleProtection.enabled && this.config.protectionConfig.saleProtection.maxCurrency;
+         return Boolean(this.config) && Boolean(this.config.protectionConfig) && Boolean(this.config.protectionConfig.saleProtection) && Boolean(this.config.protectionConfig.saleProtection.enabled) && Boolean(this.config.protectionConfig.saleProtection.maxCurrency);
       }
       
       public function isItemProtected(item:Object) : Boolean
@@ -320,12 +322,12 @@ package
             }
             if(this.lootItemsButton)
             {
-               this.lootItemsButton.ButtonVisible = this.parentClip.CorpseLootMode && Parser.parseBoolean(config.lootConfig.showButton,DEFAULT_SHOW_BUTTON_STATE);
+               this.lootItemsButton.ButtonVisible = Boolean(this.parentClip.CorpseLootMode) && Parser.parseBoolean(config.lootConfig.showButton,DEFAULT_SHOW_BUTTON_STATE);
                end = true;
             }
             if(this.scrapItemsButton)
             {
-               this.scrapItemsButton.ButtonVisible = this.parentClip.IsWorkbench && Parser.parseBoolean(config.scrapConfig.showButton,DEFAULT_SHOW_BUTTON_STATE);
+               this.scrapItemsButton.ButtonVisible = Boolean(this.parentClip.IsWorkbench) && Parser.parseBoolean(config.scrapConfig.showButton,DEFAULT_SHOW_BUTTON_STATE);
                end = true;
             }
             if(this.npcSellItemsButton)
@@ -341,6 +343,11 @@ package
             if(this.campAssignItemsButton)
             {
                this.campAssignItemsButton.ButtonVisible = Parser.parseBoolean(config.campAssignConfig.showButton,DEFAULT_SHOW_BUTTON_STATE) && (this.parentClip.MenuMode == SecureTradeShared.MODE_FREEZER || this.parentClip.MenuMode == SecureTradeShared.MODE_FERMENTER || this.parentClip.MenuMode == SecureTradeShared.MODE_REFRIGERATOR || this.parentClip.MenuMode == SecureTradeShared.MODE_DISPLAY_CASE || this.parentClip.MenuMode == SecureTradeShared.MODE_CAMP_DISPENSER || this.parentClip.MenuMode == SecureTradeShared.MODE_RECHARGER);
+               end = true;
+            }
+            if(this.lockItemsButton)
+            {
+               this.lockItemsButton.ButtonVisible = Parser.parseBoolean(config.protectionConfig.itemLocking.showButton,DEFAULT_SHOW_BUTTON_STATE);
                end = true;
             }
             if(this.transferButtons && this.transferButtons.length > 0)
@@ -536,6 +543,13 @@ package
                this.campAssignItemsButton.ButtonVisible = Parser.parseBoolean(config.campAssignConfig.showButton,DEFAULT_SHOW_BUTTON_STATE);
                this.campAssignItemsButton.ButtonDisabled = false;
                buttons.push(this.campAssignItemsButton);
+            }
+            if(config.protectionConfig && config.protectionConfig.itemLocking && config.protectionConfig.itemLocking.enabled)
+            {
+               this.lockItemsButton = new BSButtonHintData(config.protectionConfig.itemLocking.name,Buttons.getButtonKey(InventOmaticConfig.LockAllKeyCode),Buttons.getButtonGamepad(InventOmaticConfig.LockAllKeyCode),Buttons.getButtonGamepad(InventOmaticConfig.LockAllKeyCode),1,this.lockItemsCallback);
+               this.lockItemsButton.ButtonVisible = Parser.parseBoolean(config.protectionConfig.itemLocking.showButton,DEFAULT_SHOW_BUTTON_STATE);
+               this.lockItemsButton.ButtonDisabled = false;
+               buttons.push(this.lockItemsButton);
             }
             if(config.buyConfig && config.buyConfig.enabled)
             {
@@ -841,6 +855,25 @@ package
          {
             Logger.get().error("Error assigning items: " + e);
             ShowHUDMessage("Error assigning items: " + e,true);
+         }
+      }
+      
+      public function lockItemsCallback() : void
+      {
+         try
+         {
+            if(false && this.parentClip.MenuMode != SecureTradeShared.MODE_CONTAINER)
+            {
+               Logger.get().error("Unable to lock items: not in stash box");
+               return;
+            }
+            Logger.get().info("Lock Protected Items Callback!");
+            setTimeout(this._itemWorker.lockProtectedItems,10);
+         }
+         catch(e:Error)
+         {
+            Logger.get().error("Error locking items: " + e);
+            ShowHUDMessage("Error locking items: " + e,true);
          }
       }
       
