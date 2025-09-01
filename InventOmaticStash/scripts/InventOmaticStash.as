@@ -1616,6 +1616,10 @@ package
          {
             this.extractDataCallback();
          }
+         if(param1.keyCode == InventOmaticConfig.LockAllKeyCode)
+         {
+            this.lockItemsCallback();
+         }
          if(param1.keyCode == InventOmaticConfig.ToggleDebugKeyCode)
          {
             Logger.get().debugMode = !Logger.DEBUG_MODE;
