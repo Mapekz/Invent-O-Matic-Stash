@@ -1559,7 +1559,6 @@ package
                data = new JSONEncoder(apiData).getString();
                Logger.get().info("Retrieve data for: " + config.testMethod);
                Logger.get().info(data);
-               matches.forEach(Logger.get().info);
             }
          }
          if(this.parentClip.modalActive)
