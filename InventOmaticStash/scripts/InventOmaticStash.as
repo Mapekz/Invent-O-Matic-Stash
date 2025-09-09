@@ -54,8 +54,6 @@ package
       
       public var buyItemsButton:BSButtonHintData;
       
-      public var campAssignItemsButton:BSButtonHintData;
-      
       public var lockItemsButton:BSButtonHintData;
       
       public var buttonHintBar:BSButtonHintBar;
@@ -145,6 +143,24 @@ package
       public function get IsScrapStash() : Boolean
       {
          return ContainerOptionsData.storageMode == SecureTradeShared.LIMITED_TYPE_STORAGE_SCRAP;
+      }
+      
+      public function IsAssignSlotDataValid() : Boolean
+      {
+         return this.OtherInventoryTypeData.slotDataA != null && this.OtherInventoryTypeData.slotDataA.length > 0;
+      }
+      
+      public function AreAssignSlotsFull() : Boolean
+      {
+         var slot:Object = null;
+         for each(slot in this.OtherInventoryTypeData.slotDataA)
+         {
+            if(slot.slotCountFilled < slot.slotCountMax)
+            {
+               return false;
+            }
+         }
+         return true;
       }
       
       public function log(param1:String) : void
@@ -345,6 +361,7 @@ package
       {
          var button:int;
          var i:int;
+         var isValidMode:Boolean;
          var end:Boolean = false;
          try
          {
@@ -378,43 +395,58 @@ package
                this.lockItemsButton.ButtonVisible = Parser.parseBoolean(config.protectionConfig.itemLocking.showButton,DEFAULT_SHOW_BUTTON_STATE);
                end = true;
             }
-            if(this.campAssignItemsButton)
-            {
-               this.campAssignItemsButton.ButtonVisible = Parser.parseBoolean(config.campAssignConfig.showButton,DEFAULT_SHOW_BUTTON_STATE) && (this.MenuMode == SecureTradeShared.MODE_FREEZER || this.MenuMode == SecureTradeShared.MODE_FERMENTER || this.MenuMode == SecureTradeShared.MODE_REFRIGERATOR || this.MenuMode == SecureTradeShared.MODE_DISPLAY_CASE || this.MenuMode == SecureTradeShared.MODE_CAMP_DISPENSER || this.MenuMode == SecureTradeShared.MODE_RECHARGER);
-               end = true;
-            }
             if(this.assignButtons && this.assignButtons.length > 0)
             {
-               button = 0;
-               i = 0;
-               while(i < config.campAssignConfig.configs.length)
+               Logger.get().info("OwnsVendor: " + this.OwnsVendor + ", MenuMode: " + this.MenuMode);
+               Logger.get().info("IsAssignSlotDataValid: " + this.IsAssignSlotDataValid() + ", fullSlots: " + this.AreAssignSlotsFull());
+               if(this.IsAssignSlotDataValid() && !this.AreAssignSlotsFull())
                {
-                  if(config.campAssignConfig.configs[i].enabled)
+                  button = 0;
+                  i = 0;
+                  while(i < config.campAssignConfig.configs.length)
                   {
-                     if(this.assignButtons[button])
+                     if(config.campAssignConfig.configs[i].enabled)
                      {
-                        if(config.campAssignConfig.configs[i].assignMode = "VENDOR" && this.MenuMode == SecureTradeShared.MODE_VENDING_MACHINE && this.OwnsVendor)
+                        if(this.assignButtons[button])
                         {
-                           this.assignButtons[button].ButtonVisible = Parser.parseBoolean(config.transferConfig[i].showButton,DEFAULT_SHOW_BUTTON_STATE) && ItemWorker.isTheSameCharacterName(config.transferConfig[i]);
+                           if(config.campAssignConfig.configs[i].assignMode == "VENDOR")
+                           {
+                              isValidMode = this.MenuMode == SecureTradeShared.MODE_VENDING_MACHINE && this.OwnsVendor;
+                              Logger.get().info("VENDOR: " + isValidMode);
+                              this.assignButtons[button].ButtonEnabled = isValidMode;
+                              this.assignButtons[button].ButtonVisible = isValidMode && Parser.parseBoolean(config.campAssignConfig.configs[i].showButton,DEFAULT_SHOW_BUTTON_STATE) && ItemWorker.isTheSameCharacterName(config.campAssignConfig.configs[i]);
+                           }
+                           else if(config.campAssignConfig.configs[i].assignMode == "DISPLAY")
+                           {
+                              isValidMode = this.MenuMode == SecureTradeShared.MODE_DISPLAY_CASE || this.MenuMode == SecureTradeShared.MODE_ALLY || this.MenuMode == SecureTradeShared.MODE_PET;
+                              Logger.get().info("DISPLAY: " + isValidMode);
+                              this.assignButtons[button].ButtonEnabled = isValidMode;
+                              this.assignButtons[button].ButtonVisible = isValidMode && Parser.parseBoolean(config.campAssignConfig.configs[i].showButton,DEFAULT_SHOW_BUTTON_STATE) && ItemWorker.isTheSameCharacterName(config.campAssignConfig.configs[i]);
+                           }
+                           else if(config.campAssignConfig.configs[i].assignMode == "OTHER")
+                           {
+                              isValidMode = this.MenuMode == SecureTradeShared.MODE_FERMENTER || this.MenuMode == SecureTradeShared.MODE_FREEZER || this.MenuMode == SecureTradeShared.MODE_REFRIGERATOR || this.MenuMode == SecureTradeShared.MODE_RECHARGER || this.MenuMode == SecureTradeShared.MODE_CAMP_DISPENSER;
+                              Logger.get().info("OTHER: " + isValidMode);
+                              this.assignButtons[button].ButtonEnabled = isValidMode;
+                              this.assignButtons[button].ButtonVisible = isValidMode && Parser.parseBoolean(config.campAssignConfig.configs[i].showButton,DEFAULT_SHOW_BUTTON_STATE) && ItemWorker.isTheSameCharacterName(config.campAssignConfig.configs[i]);
+                           }
+                           else
+                           {
+                              Logger.get().info("INVALID MODE");
+                              this.assignButtons[button].ButtonEnabled = false;
+                              this.assignButtons[button].ButtonVisible = false;
+                           }
                         }
-                        else if(config.campAssignConfig.configs[i].assignMode = "DISPLAY" && (this.MenuMode == SecureTradeShared.MODE_DISPLAY_CASE || this.MenuMode == SecureTradeShared.MODE_ALLY || this.MenuMode == SecureTradeShared.MODE_PET))
-                        {
-                           this.assignButtons[button].ButtonVisible = Parser.parseBoolean(config.transferConfig[i].showButton,DEFAULT_SHOW_BUTTON_STATE) && ItemWorker.isTheSameCharacterName(config.transferConfig[i]);
-                        }
-                        else if(config.campAssignConfig.configs[i].assignMode = "FOOD_DRINK" && (this.MenuMode == SecureTradeShared.MODE_FERMENTER || this.MenuMode == SecureTradeShared.MODE_FREEZER || this.MenuMode == SecureTradeShared.MODE_REFRIGERATOR || this.MenuMode == SecureTradeShared.MODE_RECHARGER || this.MenuMode == SecureTradeShared.MODE_CAMP_DISPENSER))
-                        {
-                           this.assignButtons[button].ButtonVisible = Parser.parseBoolean(config.transferConfig[i].showButton,DEFAULT_SHOW_BUTTON_STATE) && ItemWorker.isTheSameCharacterName(config.transferConfig[i]);
-                        }
-                        else
-                        {
-                           this.assignButtons[button].ButtonVisible = false;
-                        }
+                        button++;
                      }
-                     button++;
+                     i++;
                   }
-                  i++;
+                  end = true;
                }
-               end = true;
+               else
+               {
+                  Logger.get().info("Not valid assign mode!");
+               }
             }
             if(this.transferButtons && this.transferButtons.length > 0)
             {
@@ -908,24 +940,35 @@ package
          }
       }
       
-      public function campAssignItemsCallback() : void
+      public function campAssignItemsCallback(keyCode:uint = 0) : void
       {
+         var validConfigs:Array;
+         var i:int;
+         var buttonId:int;
          try
          {
-            if(this.MenuMode != SecureTradeShared.MODE_FREEZER && this.MenuMode != SecureTradeShared.MODE_FERMENTER && this.MenuMode != SecureTradeShared.MODE_REFRIGERATOR && this.MenuMode != SecureTradeShared.MODE_DISPLAY_CASE && this.MenuMode != SecureTradeShared.MODE_CAMP_DISPENSER && this.MenuMode != SecureTradeShared.MODE_RECHARGER)
+            validConfigs = [];
+            i = 0;
+            buttonId = 0;
+            while(i < this.config.assignConfig.configs.length)
             {
+               if(this.config.assignConfig.configs[i] && this.config.assignConfig.configs[i].enabled)
+               {
+                  if(this.assignButtons[buttonId] && this.assignButtons[buttonId].ButtonEnabled && keyCode == this.config.assignConfig.configs[i].hotkey)
+                  {
+                     validConfigs.push(this.config.assignConfig.configs[i]);
+                  }
+                  buttonId++;
+               }
+               i++;
+            }
+            if(validConfigs.length == 0)
+            {
+               Logger.get().error("Camp Assign Items error: no matching configs found!");
                return;
             }
-            if(this.parentClip.selectedList == this.parentClip.OfferInventory_mc)
-            {
-               Logger.get().error("Unable to assign items from stash");
-               return;
-            }
-            if(this.parentClip.selectedListEntry)
-            {
-               Logger.get().info("Camp Assign Items Callback!");
-               setTimeout(this._itemWorker.campAssignItems,10);
-            }
+            Logger.get().info("Camp Assign Items Callback!");
+            setTimeout(this._itemWorker.campAssignItems,10,validConfigs);
          }
          catch(e:Error)
          {
@@ -1663,12 +1706,16 @@ package
                this.buyItemsCallback();
             }
          }
-         if(param1.keyCode == InventOmaticConfig.CampAssignKeyCode)
+         this.assignButtons[button].ButtonDisabled;
+         indexConfig = 0;
+         while(indexConfig < this.config.assignConfig.configs.length)
          {
-            if(this.config.campAssignConfig && this.config.campAssignConfig.enabled)
+            if(this.config.assignConfig.configs[indexConfig] && this.config.assignConfig.configs[indexConfig].enabled && param1.keyCode == this.config.assignConfig.configs[indexConfig].hotkey)
             {
-               this.campAssignItemsCallback();
+               this.campAssignItemsCallback(param1.keyCode);
+               break;
             }
+            indexConfig++;
          }
          indexConfig = 0;
          while(indexConfig < this.config.transferConfig.length)
