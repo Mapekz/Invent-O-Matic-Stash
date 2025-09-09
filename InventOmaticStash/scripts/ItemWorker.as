@@ -2253,6 +2253,7 @@ package
                   {
                      Logger.get().error("Invalid " + assignMode + " Assign config: " + validConfigs[i].name);
                   }
+                  i++;
                }
                break;
             case "DISPLAY":
@@ -2276,6 +2277,7 @@ package
                   {
                      Logger.get().error("Invalid " + assignMode + " Assign config: " + validConfigs[i].name);
                   }
+                  i++;
                }
          }
       }

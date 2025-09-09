@@ -950,13 +950,13 @@ package
             validConfigs = [];
             i = 0;
             buttonId = 0;
-            while(i < this.config.assignConfig.configs.length)
+            while(i < this.config.campAssignConfig.configs.length)
             {
-               if(this.config.assignConfig.configs[i] && this.config.assignConfig.configs[i].enabled)
+               if(this.config.campAssignConfig.configs[i] && this.config.campAssignConfig.configs[i].enabled)
                {
-                  if(this.assignButtons[buttonId] && this.assignButtons[buttonId].ButtonEnabled && keyCode == this.config.assignConfig.configs[i].hotkey)
+                  if(this.assignButtons[buttonId] && this.assignButtons[buttonId].ButtonEnabled && keyCode == this.config.campAssignConfig.configs[i].hotkey)
                   {
-                     validConfigs.push(this.config.assignConfig.configs[i]);
+                     validConfigs.push(this.config.campAssignConfig.configs[i]);
                   }
                   buttonId++;
                }
@@ -1706,11 +1706,10 @@ package
                this.buyItemsCallback();
             }
          }
-         this.assignButtons[button].ButtonDisabled;
          indexConfig = 0;
-         while(indexConfig < this.config.assignConfig.configs.length)
+         while(indexConfig < this.config.campAssignConfig.configs.length)
          {
-            if(this.config.assignConfig.configs[indexConfig] && this.config.assignConfig.configs[indexConfig].enabled && param1.keyCode == this.config.assignConfig.configs[indexConfig].hotkey)
+            if(this.config.campAssignConfig.configs[indexConfig] && this.config.campAssignConfig.configs[indexConfig].enabled && param1.keyCode == this.config.campAssignConfig.configs[indexConfig].hotkey)
             {
                this.campAssignItemsCallback(param1.keyCode);
                break;
