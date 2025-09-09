@@ -1756,16 +1756,38 @@ package
          return false;
       }
       
-      private function isValidCampAssignConfig() : Boolean
+      private function isValidCampAssignConfig(sectionConfig:Object) : Boolean
       {
-         var config:Object = null;
-         if(_config)
+         if(sectionConfig && sectionConfig.enabled && (sectionConfig.onlyHighlightedItem || sectionConfig.configs && sectionConfig.configs.length > 0))
          {
-            config = _config.campAssignConfig;
-            if(config && config.enabled && config.amount && int(config.amount) > 0 && config.delay && int(config.delay) > 0)
-            {
-               return true;
-            }
+            return isTheSameCharacterName(sectionConfig) && isValidContainerName(sectionConfig);
+         }
+         return false;
+      }
+      
+      private function isValidCampAssignSubConfig(subConfig:Object) : Boolean
+      {
+         if(subConfig && subConfig.enabled && subConfig.matchMode && subConfig.itemNames && subConfig.itemNames.length > 0)
+         {
+            return isTheSameCharacterName(subConfig) && isValidContainerName(subConfig);
+         }
+         return false;
+      }
+      
+      private function isValidVendorAssignConfig(sectionConfig:Object) : Boolean
+      {
+         if(sectionConfig && sectionConfig.enabled && (sectionConfig.onlyHighlightedItem && sectionConfig.price != null || sectionConfig.configs && sectionConfig.configs.length > 0))
+         {
+            return isTheSameCharacterName(sectionConfig) && isValidContainerName(sectionConfig);
+         }
+         return false;
+      }
+      
+      private function isValidVendorAssignSubConfig(subConfig:Object) : Boolean
+      {
+         if(subConfig && subConfig.enabled && subConfig.price != null && subConfig.matchMode && subConfig.itemNames && subConfig.itemNames.length > 0)
+         {
+            return isTheSameCharacterName(subConfig) && isValidContainerName(subConfig);
          }
          return false;
       }
@@ -2206,26 +2228,55 @@ package
          }
       }
       
-      public function campAssignItems() : void
+      public function campAssignItems(validConfigs:Array) : void
       {
-         if(this.isValidCampAssignConfig())
+         if(validConfigs.length == 0)
          {
-            if(_config.campAssignConfig.debug)
-            {
-               Logger.get().info("Valid campAssign config");
-            }
-            if(this.secureTrade.MenuMode == SecureTradeShared.MODE_DISPLAY_CASE)
-            {
-               this.displayAssign(_config.campAssignConfig);
-            }
-            else
-            {
-               this.campAssign(_config.campAssignConfig);
-            }
+            return;
          }
-         else
+         var delay:int = 0;
+         var assignMode:String = validConfigs[0].assignMode;
+         switch(assignMode)
          {
-            Logger.get().error("Invalid campAssign config");
+            case "VENDOR":
+               var i:int = 0;
+               while(i < validConfigs.length)
+               {
+                  if(this.isValidVendorAssignConfig(validConfigs[i]))
+                  {
+                     if(validConfigs[i].debug)
+                     {
+                        Logger.get().info("Valid " + assignMode + " Assign config: " + validConfigs[i].name);
+                     }
+                  }
+                  else
+                  {
+                     Logger.get().error("Invalid " + assignMode + " Assign config: " + validConfigs[i].name);
+                  }
+               }
+               break;
+            case "DISPLAY":
+            case "OTHER":
+               i = 0;
+               while(i < validConfigs.length)
+               {
+                  if(this.isValidCampAssignConfig(validConfigs[i]))
+                  {
+                     if(validConfigs[i].debug)
+                     {
+                        Logger.get().info("Valid " + assignMode + " Assign config: " + validConfigs[i].name);
+                     }
+                     if(false)
+                     {
+                        this.displayAssign(_config.campAssignConfig);
+                        this.campAssign(_config.campAssignConfig);
+                     }
+                  }
+                  else
+                  {
+                     Logger.get().error("Invalid " + assignMode + " Assign config: " + validConfigs[i].name);
+                  }
+               }
          }
       }
       
