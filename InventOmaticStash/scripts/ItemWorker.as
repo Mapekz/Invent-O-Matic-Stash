@@ -2234,16 +2234,39 @@ package
          {
             return;
          }
+         var i:int = 0;
          var delay:int = 0;
          var assignMode:String = validConfigs[0].assignMode;
+         var filterValidConfigs:Array = [];
          switch(assignMode)
          {
             case "VENDOR":
-               var i:int = 0;
+               i = 0;
                while(i < validConfigs.length)
                {
                   if(this.isValidVendorAssignConfig(validConfigs[i]))
                   {
+                     filterValidConfigs.push(validConfigs[i]);
+                     if(validConfigs[i].debug)
+                     {
+                        Logger.get().info("Valid VENDOR Assign config: " + validConfigs[i].name);
+                     }
+                  }
+                  else
+                  {
+                     Logger.get().error("Invalid VENDOR Assign config: " + validConfigs[i].name);
+                  }
+                  i++;
+               }
+               break;
+            case "DISPLAY":
+            case "OTHER":
+               i = 0;
+               while(i < validConfigs.length)
+               {
+                  if(this.isValidCampAssignConfig(validConfigs[i]))
+                  {
+                     filterValidConfigs.push(validConfigs[i]);
                      if(validConfigs[i].debug)
                      {
                         Logger.get().info("Valid " + assignMode + " Assign config: " + validConfigs[i].name);
@@ -2256,29 +2279,8 @@ package
                   i++;
                }
                break;
-            case "DISPLAY":
-            case "OTHER":
-               i = 0;
-               while(i < validConfigs.length)
-               {
-                  if(this.isValidCampAssignConfig(validConfigs[i]))
-                  {
-                     if(validConfigs[i].debug)
-                     {
-                        Logger.get().info("Valid " + assignMode + " Assign config: " + validConfigs[i].name);
-                     }
-                     if(false)
-                     {
-                        this.displayAssign(_config.campAssignConfig);
-                        this.campAssign(_config.campAssignConfig);
-                     }
-                  }
-                  else
-                  {
-                     Logger.get().error("Invalid " + assignMode + " Assign config: " + validConfigs[i].name);
-                  }
-                  i++;
-               }
+            default:
+               Logger.get().error("Invalid assignMode " + assignMode + " in config: " + validConfigs[i].name);
          }
       }
       
