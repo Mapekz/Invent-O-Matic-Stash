@@ -410,20 +410,20 @@ package
                            if(config.campAssignConfig.configs[i].assignMode == CampAssignContainer.VENDOR)
                            {
                               isValidMode = this.MenuMode == SecureTradeShared.MODE_VENDING_MACHINE && this.OwnsVendor;
-                              this.assignButtons[button].ButtonEnabled = isValidMode;
-                              this.assignButtons[button].ButtonVisible = isValidMode && Parser.parseBoolean(config.campAssignConfig.configs[i].showButton,DEFAULT_SHOW_BUTTON_STATE) && ItemWorker.isTheSameCharacterName(config.campAssignConfig.configs[i]);
+                              this.assignButtons[button].ButtonEnabled = isValidMode && ItemWorker.isTheSameCharacterName(config.campAssignConfig.configs[i]) && ItemWorker.isValidContainerName(config.campAssignConfig.configs[i]);
+                              this.assignButtons[button].ButtonVisible = this.assignButtons[button].ButtonEnabled && Parser.parseBoolean(config.campAssignConfig.configs[i].showButton,DEFAULT_SHOW_BUTTON_STATE);
                            }
                            else if(config.campAssignConfig.configs[i].assignMode == CampAssignContainer.DISPLAY)
                            {
                               isValidMode = this.MenuMode == SecureTradeShared.MODE_DISPLAY_CASE || this.MenuMode == SecureTradeShared.MODE_ALLY || this.MenuMode == SecureTradeShared.MODE_PET;
-                              this.assignButtons[button].ButtonEnabled = isValidMode;
-                              this.assignButtons[button].ButtonVisible = isValidMode && Parser.parseBoolean(config.campAssignConfig.configs[i].showButton,DEFAULT_SHOW_BUTTON_STATE) && ItemWorker.isTheSameCharacterName(config.campAssignConfig.configs[i]);
+                              this.assignButtons[button].ButtonEnabled = isValidMode && ItemWorker.isTheSameCharacterName(config.campAssignConfig.configs[i]) && ItemWorker.isValidContainerName(config.campAssignConfig.configs[i]);
+                              this.assignButtons[button].ButtonVisible = this.assignButtons[button].ButtonEnabled && Parser.parseBoolean(config.campAssignConfig.configs[i].showButton,DEFAULT_SHOW_BUTTON_STATE) && ItemWorker.isTheSameCharacterName(config.campAssignConfig.configs[i]);
                            }
                            else if(config.campAssignConfig.configs[i].assignMode == CampAssignContainer.OTHER)
                            {
                               isValidMode = this.MenuMode == SecureTradeShared.MODE_FERMENTER || this.MenuMode == SecureTradeShared.MODE_FREEZER || this.MenuMode == SecureTradeShared.MODE_REFRIGERATOR || this.MenuMode == SecureTradeShared.MODE_RECHARGER || this.MenuMode == SecureTradeShared.MODE_CAMP_DISPENSER;
-                              this.assignButtons[button].ButtonEnabled = isValidMode;
-                              this.assignButtons[button].ButtonVisible = isValidMode && Parser.parseBoolean(config.campAssignConfig.configs[i].showButton,DEFAULT_SHOW_BUTTON_STATE) && ItemWorker.isTheSameCharacterName(config.campAssignConfig.configs[i]);
+                              this.assignButtons[button].ButtonEnabled = isValidMode && ItemWorker.isTheSameCharacterName(config.campAssignConfig.configs[i]) && ItemWorker.isValidContainerName(config.campAssignConfig.configs[i]);
+                              this.assignButtons[button].ButtonVisible = this.assignButtons[button].ButtonEnabled && Parser.parseBoolean(config.campAssignConfig.configs[i].showButton,DEFAULT_SHOW_BUTTON_STATE) && ItemWorker.isTheSameCharacterName(config.campAssignConfig.configs[i]);
                            }
                            else
                            {
@@ -966,7 +966,6 @@ package
             }
             if(validConfigs.length == 0)
             {
-               Logger.get().error("Camp Assign Items error: no matching configs found!");
                return;
             }
             Logger.get().info("Camp Assign Items Callback!");
