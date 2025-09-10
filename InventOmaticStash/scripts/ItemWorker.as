@@ -1857,7 +1857,7 @@ package
                               {
                                  if(config.debug)
                                  {
-                                    Logger.get().info("Valid item to assign [" + item.serverHandleID + "]: " + item.text + "(" + amount + ")");
+                                    Logger.get().info("Valid item to assign: " + item.text + "(" + amount + ")");
                                  }
                                  assignSlotsFree--;
                                  i = 0;
@@ -1866,7 +1866,7 @@ package
                                  {
                                     if(debug)
                                     {
-                                       Logger.get().info("Assigning [" + serverHandleID + "]: " + text + "(" + amount + ") x" + price + "c");
+                                       Logger.get().info("Assigning: " + text + "(" + amount + ") x" + price + "c");
                                     }
                                     GameApiDataExtractor.campSellItem(serverHandleID,amount,price);
                                  },delay,item.text,item.serverHandleID,amount,price < 0 ? item.itemValue : price,config.debug);

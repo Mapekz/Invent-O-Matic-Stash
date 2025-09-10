@@ -1,5 +1,6 @@
 package
 {
+   import utils.CampAssignContainer;
    import utils.Parser;
    
    public class InventOmaticConfig
@@ -172,11 +173,6 @@ package
          if(config.campAssignConfig)
          {
             config.campAssignConfig = loadAssignConfig(config.campAssignConfig);
-            for(c in config.campAssignConfig.configs)
-            {
-               setName(config.campAssignConfig.configs[c],TITLE_ASSIGN);
-               config.campAssignConfig.configs[c].name = config.campAssignConfig.configs[c].name.replace(_AMOUNT,AMOUNT).replace(AMOUNT,config.campAssignConfig.configs[c].amount);
-            }
          }
          if(config.buyConfig)
          {
@@ -294,7 +290,17 @@ package
       {
          if(!config.configs || !(config.configs is Array))
          {
+            config.onlyHighlightedItem = true;
             config.configs = [].concat(config);
+         }
+         for(c in config.configs)
+         {
+            setName(config.configs[c],TITLE_ASSIGN);
+            if(!config.configs[c].assignMode)
+            {
+               config.configs[c].assignMode = CampAssignContainer.OTHER;
+            }
+            config.configs[c].name = config.configs[c].name.replace(_AMOUNT,AMOUNT).replace(AMOUNT,config.configs[c].amount);
          }
          return config;
       }
