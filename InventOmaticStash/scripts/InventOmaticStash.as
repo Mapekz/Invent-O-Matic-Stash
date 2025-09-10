@@ -440,7 +440,13 @@ package
                }
                else
                {
-                  Logger.get().info("Not valid assign mode!");
+                  i = 0;
+                  while(i < this.assignButtons.length)
+                  {
+                     this.assignButtons[i].ButtonEnabled = false;
+                     this.assignButtons[i].ButtonVisible = false;
+                     i++;
+                  }
                }
             }
             if(this.transferButtons && this.transferButtons.length > 0)
