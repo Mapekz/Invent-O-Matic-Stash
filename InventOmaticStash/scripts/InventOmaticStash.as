@@ -557,7 +557,7 @@ package
                   this.parentClip.SCRAP_ITEM_COUNT_THRESHOLD = config.scrapItemCountThresholdPopup;
                   isSet = true;
                }
-               if(config.transferItemCountThresholdPopup != null && !isNaN(config.transferItemCountThresholdPopup) && config.transferItemCountThresholdPopup != 5)
+               if(config.transferItemCountThresholdPopup != null && !isNaN(config.transferItemCountThresholdPopup) && config.transferItemCountThresholdPopup != 4)
                {
                   this.parentClip.TRANSFER_ITEM_COUNT_THRESHOLD = config.transferItemCountThresholdPopup;
                   isSet = true;
