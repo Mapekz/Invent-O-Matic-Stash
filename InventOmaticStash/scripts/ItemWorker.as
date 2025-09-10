@@ -1521,13 +1521,13 @@ package
                }
                if(config.onlyHighlightedItem)
                {
+                  delayStep = Parser.parsePositiveNumber(config.delay,600);
                   selectedListEntry = this._selectedEntry;
                   if(selectedListEntry.currentHealth != -1 || CampAssignContainer.MenuMode == SecureTradeShared.MODE_CAMP_DISPENSER)
                   {
                      amount = Math.min(getAmount(config.amount,selectedListEntry.count),assignSlotsFree);
                      if(amount > 0)
                      {
-                        delayStep = Parser.parsePositiveNumber(config.delay,600);
                         assignSlotsFree -= amount;
                         while(i < amount)
                         {
@@ -1542,12 +1542,12 @@ package
                            },delay,selectedListEntry,config.debug);
                            i++;
                         }
-                        delay += delayStep;
                      }
                   }
                }
                else if(config.configs && config.configs.length > 0)
                {
+                  delayStep = Parser.parsePositiveNumber(config.delay,600);
                   subConfigIndex = 0;
                   isValidMenuMode = CampAssignContainer.MenuMode == SecureTradeShared.MODE_CAMP_DISPENSER;
                   while(subConfigIndex < config.configs.length)
@@ -1564,11 +1564,13 @@ package
                            {
                               if(isItemMatchingConfig(item,subConfig))
                               {
-                                 Logger.get().info("Valid item to assign: " + item.text);
                                  amount = Math.min(getAmount(subConfig.amount,item.count),assignSlotsFree);
                                  if(amount > 0)
                                  {
-                                    delayStep = Parser.parsePositiveNumber(config.delay,600);
+                                    if(config.debug)
+                                    {
+                                       Logger.get().info("Valid item to assign: " + item.text);
+                                    }
                                     assignSlotsFree -= amount;
                                     i = 0;
                                     while(i < amount)
@@ -1584,7 +1586,6 @@ package
                                        },delay,item,config.debug);
                                        i++;
                                     }
-                                    delay += delayStep;
                                  }
                               }
                            }
@@ -1603,76 +1604,137 @@ package
          }
       }
       
-      private function displayAssign(config:Object) : void
+      private function displayAssign(validConfigs:Array) : void
       {
-         var delay:uint;
          var amount:int;
          var selectedListEntry:Object;
+         var assignSlotsFree:int;
+         var configIndex:int;
+         var config:Object;
+         var subConfigIndex:int;
+         var subConfig:Object;
          var inventory:Array;
-         var items:Vector.<Object> = new Vector.<Object>();
+         var item:Object;
+         var isValidMenuMode:Boolean;
+         var itemIndex:int;
+         var items:Array;
          var i:int = 0;
-         var index:int = 0;
+         var j:int = 0;
          var end:Boolean = false;
-         if(config.debug)
-         {
-            Logger.get().info("Display assign");
-         }
+         var delay:int = 0;
+         var delayStep:int = 0;
          try
          {
-            amount = Parser.parseNumber(config.amount,0);
-            selectedListEntry = this._selectedEntry;
-            inventory = this._playerInventory;
-            if(inventory && inventory.length > 0)
+            if(!validConfigs || validConfigs.length == 0)
             {
-               i = 0;
-               while(i < inventory.length)
+               return;
+            }
+            assignSlotsFree = int(CampAssignContainer.AssignSlotsFree);
+            configIndex = 0;
+            while(configIndex < validConfigs.length)
+            {
+               config = validConfigs[configIndex];
+               if(config.debug)
                {
-                  index = 0;
-                  if(inventory[i].text === selectedListEntry.text && inventory[i].filterFlag === selectedListEntry.filterFlag && inventory[i].equipState == 0 && !inventory[i].favorite)
-                  {
-                     while(index < inventory[i].count)
-                     {
-                        items.push(inventory[i]);
-                        if(items.length == amount)
-                        {
-                           end = true;
-                           break;
-                        }
-                        index++;
-                     }
-                     if(end)
-                     {
-                        break;
-                     }
-                  }
-                  i++;
+                  Logger.get().info("Assign slots free: " + assignSlotsFree + "/" + CampAssignContainer.AssignSlotsMax);
                }
-            }
-            if(config.debug)
-            {
-               Logger.get().info("Assigning " + items.length + " " + selectedListEntry.text);
-            }
-            i = 0;
-            index = 0;
-            end = false;
-            while(i < items.length)
-            {
-               setTimeout(function():void
+               if(config.onlyHighlightedItem)
                {
-                  if(!end && performContainerWeightCheck(selectedListEntry,1,secureTrade.OfferInventory_mc))
+                  items = [];
+                  amount = Math.min(config.amount,assignSlotsFree);
+                  selectedListEntry = this._selectedEntry;
+                  inventory = this._playerInventory;
+                  if(inventory)
                   {
-                     if(secureTrade.SlotInfo_mc.visible && !secureTrade.SlotInfo_mc.AreSlotsFull())
+                     i = 0;
+                     while(i < inventory.length)
                      {
-                        GameApiDataExtractor.displayAssignItem(items[index],false);
+                        item = inventory[i];
+                        if(item.text === selectedListEntry.text && item.filterFlag === selectedListEntry.filterFlag && item.equipState == 0 && !item.favorite)
+                        {
+                           j = 0;
+                           while(j < item.count)
+                           {
+                              items.push(item);
+                              amount--;
+                              if(amount == 0)
+                              {
+                                 break;
+                              }
+                              j++;
+                           }
+                           if(amount == 0)
+                           {
+                              break;
+                           }
+                        }
+                        i++;
                      }
-                     else
+                     delayStep = Parser.parsePositiveNumber(config.delay,600);
+                     i = 0;
+                     while(i < items.length)
                      {
-                        end = true;
+                        delay += delayStep;
+                        assignSlotsFree -= 1;
+                        setTimeout(function(item:Object, debug:Boolean):void
+                        {
+                           if(debug)
+                           {
+                              Logger.get().info("Assigning: " + item.text);
+                           }
+                           GameApiDataExtractor.displayAssignItem(item,false);
+                        },delay,items[i],config.debug);
+                        i++;
                      }
                   }
-                  ++index;
-               },config.delay * i);
-               i++;
+               }
+               else if(config.configs && config.configs.length > 0)
+               {
+                  delayStep = Parser.parsePositiveNumber(config.delay,600);
+                  subConfigIndex = 0;
+                  while(subConfigIndex < config.configs.length)
+                  {
+                     subConfig = config.configs[subConfigIndex];
+                     inventory = this._playerInventory;
+                     if(subConfig.enabled && inventory)
+                     {
+                        itemIndex = 0;
+                        while(itemIndex < inventory.length)
+                        {
+                           item = inventory[itemIndex];
+                           if(item.equipState == 0 && !item.favorite && isItemMatchingConfig(item,subConfig))
+                           {
+                              amount = Math.min(getAmount(subConfig.amount,item.count),assignSlotsFree);
+                              if(amount > 0)
+                              {
+                                 if(config.debug)
+                                 {
+                                    Logger.get().info("Valid item to assign: " + item.text);
+                                 }
+                                 assignSlotsFree -= amount;
+                                 i = 0;
+                                 while(i < amount)
+                                 {
+                                    delay += delayStep;
+                                    setTimeout(function(_item:Object, debug:Boolean):void
+                                    {
+                                       if(debug)
+                                       {
+                                          Logger.get().info("Assigning: " + _item.text);
+                                       }
+                                       GameApiDataExtractor.displayAssignItem(_item,false);
+                                    },delay,item,config.debug);
+                                    i++;
+                                 }
+                              }
+                           }
+                           itemIndex++;
+                        }
+                     }
+                     subConfigIndex++;
+                  }
+               }
+               configIndex++;
             }
          }
          catch(e:Error)
