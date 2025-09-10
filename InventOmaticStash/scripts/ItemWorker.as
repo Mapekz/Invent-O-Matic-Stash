@@ -1542,6 +1542,14 @@ package
                            },delay,selectedListEntry,config.debug);
                            i++;
                         }
+                        if(assignSlotsFree <= 0)
+                        {
+                           if(debug)
+                           {
+                              Logger.get().info("No free assign slots left!");
+                           }
+                           return;
+                        }
                      }
                   }
                }
@@ -1585,6 +1593,14 @@ package
                                           GameApiDataExtractor.campAssignItem(_item,false);
                                        },delay,item,config.debug);
                                        i++;
+                                    }
+                                    if(assignSlotsFree <= 0)
+                                    {
+                                       if(debug)
+                                       {
+                                          Logger.get().info("No free assign slots left!");
+                                       }
+                                       return;
                                     }
                                  }
                               }
@@ -1675,7 +1691,7 @@ package
                      while(i < items.length)
                      {
                         delay += delayStep;
-                        assignSlotsFree -= 1;
+                        assignSlotsFree--;
                         setTimeout(function(item:Object, debug:Boolean):void
                         {
                            if(debug)
@@ -1684,6 +1700,14 @@ package
                            }
                            GameApiDataExtractor.displayAssignItem(item,false);
                         },delay,items[i],config.debug);
+                        if(assignSlotsFree <= 0)
+                        {
+                           if(debug)
+                           {
+                              Logger.get().info("No free assign slots left!");
+                           }
+                           return;
+                        }
                         i++;
                      }
                   }
@@ -1726,6 +1750,14 @@ package
                                     },delay,item,config.debug);
                                     i++;
                                  }
+                                 if(assignSlotsFree <= 0)
+                                 {
+                                    if(debug)
+                                    {
+                                       Logger.get().info("No free assign slots left!");
+                                    }
+                                    return;
+                                 }
                               }
                            }
                            itemIndex++;
@@ -1740,6 +1772,126 @@ package
          catch(e:Error)
          {
             Logger.get().errorHandler("Error ItemWorker displayAssign",e);
+         }
+      }
+      
+      private function vendorAssign(validConfigs:Array) : void
+      {
+         var amount:int;
+         var selectedListEntry:Object;
+         var assignSlotsFree:int;
+         var configIndex:int;
+         var config:Object;
+         var subConfigIndex:int;
+         var subConfig:Object;
+         var inventory:Array;
+         var item:Object;
+         var itemIndex:int;
+         var price:int;
+         var i:int = 0;
+         var end:Boolean = false;
+         var delay:int = 0;
+         var delayStep:int = 0;
+         try
+         {
+            if(!validConfigs || validConfigs.length == 0)
+            {
+               return;
+            }
+            assignSlotsFree = int(CampAssignContainer.AssignSlotsFree);
+            configIndex = 0;
+            while(configIndex < validConfigs.length)
+            {
+               config = validConfigs[configIndex];
+               if(config.debug)
+               {
+                  Logger.get().info("Assign slots free: " + assignSlotsFree + "/" + CampAssignContainer.AssignSlotsMax);
+               }
+               if(config.onlyHighlightedItem)
+               {
+                  delayStep = Parser.parsePositiveNumber(config.delay,600);
+                  selectedListEntry = this._selectedEntry;
+                  amount = getAmount(config.amount,selectedListEntry.count);
+                  price = Parser.parseNumber(config.price,-1);
+                  if(amount > 0)
+                  {
+                     assignSlotsFree--;
+                     delay += delayStep;
+                     setTimeout(function(item:Object, amount:int, price:int, debug:Boolean):void
+                     {
+                        if(debug)
+                        {
+                           Logger.get().info("Assigning: " + item.text + "(" + amount + ") x" + price + "c");
+                        }
+                        GameApiDataExtractor.campSellItem(item,amount,price);
+                     },delay,selectedListEntry,amount,price < 0 ? item.itemValue : price,config.debug);
+                     if(assignSlotsFree <= 0)
+                     {
+                        if(debug)
+                        {
+                           Logger.get().info("No free assign slots left!");
+                        }
+                        return;
+                     }
+                  }
+               }
+               else if(config.configs && config.configs.length > 0)
+               {
+                  delayStep = Parser.parsePositiveNumber(config.delay,600);
+                  subConfigIndex = 0;
+                  while(subConfigIndex < config.configs.length)
+                  {
+                     subConfig = config.configs[subConfigIndex];
+                     inventory = this._playerInventory;
+                     if(subConfig.enabled && inventory)
+                     {
+                        price = Parser.parseNumber(config.price,-1);
+                        itemIndex = 0;
+                        while(itemIndex < inventory.length)
+                        {
+                           item = inventory[itemIndex];
+                           if(isItemMatchingConfig(item,subConfig))
+                           {
+                              amount = getAmount(subConfig.amount,item.count);
+                              if(amount > 0)
+                              {
+                                 if(config.debug)
+                                 {
+                                    Logger.get().info("Valid item to assign: " + item.text + "(" + amount + ")");
+                                 }
+                                 assignSlotsFree--;
+                                 i = 0;
+                                 delay += delayStep;
+                                 setTimeout(function(item:Object, amount:int, price:int, debug:Boolean):void
+                                 {
+                                    if(debug)
+                                    {
+                                       Logger.get().info("Assigning: " + item.text + "(" + amount + ") x" + price + "c");
+                                    }
+                                    GameApiDataExtractor.campSellItem(item,amount,price);
+                                 },delay,item,amount,price < 0 ? item.itemValue : price,config.debug);
+                                 if(assignSlotsFree <= 0)
+                                 {
+                                    if(debug)
+                                    {
+                                       Logger.get().info("No free assign slots left!");
+                                    }
+                                    return;
+                                 }
+                              }
+                           }
+                           itemIndex++;
+                        }
+                     }
+                     subConfigIndex++;
+                  }
+               }
+               configIndex++;
+            }
+         }
+         catch(e:Error)
+         {
+            Logger.get().errorHandler("Error ItemWorker vendorAssign",e);
          }
       }
       
