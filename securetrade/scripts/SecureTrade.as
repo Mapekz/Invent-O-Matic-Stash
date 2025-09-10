@@ -285,9 +285,9 @@ package
       
       private const NO_FILTER_ID:int = -1;
       
-      private const SCRAP_ITEM_COUNT_THRESHOLD:uint = 5;
+      public var SCRAP_ITEM_COUNT_THRESHOLD:uint = 5;
       
-      private const TRANSFER_ITEM_COUNT_THRESHOLD:uint = 4;
+      public var TRANSFER_ITEM_COUNT_THRESHOLD:uint = 4;
       
       private const WEAPONS_TAB_INDEX:* = 2;
       

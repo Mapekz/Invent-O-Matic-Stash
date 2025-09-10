@@ -527,6 +527,7 @@ package
          this._itemExtractor.init(config.extractConfig);
          this._customFormatExtractor.init(config.extractConfig);
          this._customFormatConvertExtractor.init(config.extractConfig);
+         this.initItemCountThreshold();
          this.initTabs();
          this.initCurrencyLimit();
          this.initButtonHints();
@@ -541,6 +542,37 @@ package
          LegendaryMods.init();
          stage.addEventListener(KeyboardEvent.KEY_UP,this.keyUpHandler);
          stage.addEventListener(KeyboardEvent.KEY_DOWN,this.keyDownHandler);
+      }
+      
+      private function initItemCountThreshold() : *
+      {
+         var isSet:Boolean;
+         try
+         {
+            if(config)
+            {
+               isSet = false;
+               if(config.scrapItemCountThresholdPopup != null && !isNaN(config.scrapItemCountThresholdPopup) && config.scrapItemCountThresholdPopup != 5)
+               {
+                  this.parentClip.SCRAP_ITEM_COUNT_THRESHOLD = config.scrapItemCountThresholdPopup;
+                  isSet = true;
+               }
+               if(config.transferItemCountThresholdPopup != null && !isNaN(config.transferItemCountThresholdPopup) && config.transferItemCountThresholdPopup != 5)
+               {
+                  this.parentClip.TRANSFER_ITEM_COUNT_THRESHOLD = config.transferItemCountThresholdPopup;
+                  isSet = true;
+               }
+               if(isSet)
+               {
+                  Logger.get().info("ItemCountThreshold set: " + config.scrapItemCountThresholdPopup + ", " + config.transferItemCountThresholdPopup);
+               }
+            }
+         }
+         catch(e:Error)
+         {
+            Logger.get().errorHandler("Error initItemCountThreshold",e);
+            ShowHUDMessage("Error initItemCountThreshold " + e,true);
+         }
       }
       
       private function initTabs() : *
