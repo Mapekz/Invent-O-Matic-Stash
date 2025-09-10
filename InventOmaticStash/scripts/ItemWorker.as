@@ -1544,7 +1544,7 @@ package
                         }
                         if(assignSlotsFree <= 0)
                         {
-                           if(debug)
+                           if(config.debug)
                            {
                               Logger.get().info("No free assign slots left!");
                            }
@@ -1596,7 +1596,7 @@ package
                                     }
                                     if(assignSlotsFree <= 0)
                                     {
-                                       if(debug)
+                                       if(config.debug)
                                        {
                                           Logger.get().info("No free assign slots left!");
                                        }
@@ -1702,7 +1702,7 @@ package
                         },delay,items[i],config.debug);
                         if(assignSlotsFree <= 0)
                         {
-                           if(debug)
+                           if(config.debug)
                            {
                               Logger.get().info("No free assign slots left!");
                            }
@@ -1752,7 +1752,7 @@ package
                                  }
                                  if(assignSlotsFree <= 0)
                                  {
-                                    if(debug)
+                                    if(config.debug)
                                     {
                                        Logger.get().info("No free assign slots left!");
                                     }
@@ -1817,17 +1817,17 @@ package
                   {
                      assignSlotsFree--;
                      delay += delayStep;
-                     setTimeout(function(item:Object, amount:int, price:int, debug:Boolean):void
+                     setTimeout(function(_item:Object, amount:uint, price:uint, debug:Boolean):void
                      {
                         if(debug)
                         {
-                           Logger.get().info("Assigning: " + item.text + "(" + amount + ") x" + price + "c");
+                           Logger.get().info("Assigning: " + _item.text + "(" + amount + ") x" + price + "c");
                         }
-                        GameApiDataExtractor.campSellItem(item,amount,price);
-                     },delay,selectedListEntry,amount,price < 0 ? item.itemValue : price,config.debug);
+                        GameApiDataExtractor.campSellItem(_item.serverHandleID,amount,price);
+                     },delay,selectedListEntry,amount,price < 0 ? selectedListEntry.itemValue : price,config.debug);
                      if(assignSlotsFree <= 0)
                      {
-                        if(debug)
+                        if(config.debug)
                         {
                            Logger.get().info("No free assign slots left!");
                         }
@@ -1845,7 +1845,7 @@ package
                      inventory = this._playerInventory;
                      if(subConfig.enabled && inventory)
                      {
-                        price = Parser.parseNumber(config.price,-1);
+                        price = Parser.parseNumber(subConfig.price,-1);
                         itemIndex = 0;
                         while(itemIndex < inventory.length)
                         {
@@ -1857,22 +1857,22 @@ package
                               {
                                  if(config.debug)
                                  {
-                                    Logger.get().info("Valid item to assign: " + item.text + "(" + amount + ")");
+                                    Logger.get().info("Valid item to assign [" + item.serverHandleID + "]: " + item.text + "(" + amount + ")");
                                  }
                                  assignSlotsFree--;
                                  i = 0;
                                  delay += delayStep;
-                                 setTimeout(function(item:Object, amount:int, price:int, debug:Boolean):void
+                                 setTimeout(function(text:String, serverHandleID:uint, amount:uint, price:uint, debug:Boolean):void
                                  {
                                     if(debug)
                                     {
-                                       Logger.get().info("Assigning: " + item.text + "(" + amount + ") x" + price + "c");
+                                       Logger.get().info("Assigning [" + serverHandleID + "]: " + text + "(" + amount + ") x" + price + "c");
                                     }
-                                    GameApiDataExtractor.campSellItem(item,amount,price);
-                                 },delay,item,amount,price < 0 ? item.itemValue : price,config.debug);
+                                    GameApiDataExtractor.campSellItem(serverHandleID,amount,price);
+                                 },delay,item.text,item.serverHandleID,amount,price < 0 ? item.itemValue : price,config.debug);
                                  if(assignSlotsFree <= 0)
                                  {
-                                    if(debug)
+                                    if(config.debug)
                                     {
                                        Logger.get().info("No free assign slots left!");
                                     }

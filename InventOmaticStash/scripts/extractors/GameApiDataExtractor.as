@@ -156,10 +156,10 @@ package extractors
          }));
       }
       
-      public static function campSellItem(param1:Object, param2:int, param3:int) : void
+      public static function campSellItem(param1:uint, param2:uint, param3:uint) : void
       {
          BSUIDataManager.dispatchEvent(new CustomEvent(EVENT_CAMP_SELL_ITEM,{
-            "serverHandleID":param1.serverHandleID,
+            "serverHandleID":param1,
             "quantity":param2,
             "price":param3,
             "partialOffer":true,
