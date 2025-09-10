@@ -24,6 +24,8 @@ package extractors
       
       public static const EVENT_CAMP_DISPLAY_DECORATE_ITEM_IN_SLOT:String = "CampDecorate::DisplayDecorateItemInSlot";
       
+      public static const EVENT_CAMP_SELL_ITEM:String = "CampVend::SellItem";
+      
       public static const EVENT_LOCK_ITEM:String = "Container::TransferLockToggle";
       
       public static var PlayerInventoryData:String = "PlayerInventoryData";
@@ -151,6 +153,17 @@ package extractors
          BSUIDataManager.dispatchEvent(new CustomEvent(EVENT_CAMP_DISPLAY_DECORATE_ITEM_IN_SLOT,{
             "serverHandleID":param1.serverHandleID,
             "fromContainer":param2
+         }));
+      }
+      
+      public static function campSellItem(param1:Object, param2:int, param3:int) : void
+      {
+         BSUIDataManager.dispatchEvent(new CustomEvent(EVENT_CAMP_SELL_ITEM,{
+            "serverHandleID":param1.serverHandleID,
+            "quantity":param2,
+            "price":param3,
+            "partialOffer":true,
+            "fromContainer":false
          }));
       }
       
