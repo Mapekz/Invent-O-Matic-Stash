@@ -174,6 +174,13 @@ package
          {
             config.campAssignConfig = loadAssignConfig(config.campAssignConfig);
          }
+         else
+         {
+            config.campAssignConfig = {
+               "enabled":false,
+               "configs":[]
+            };
+         }
          if(config.buyConfig)
          {
             setName(config.buyConfig,TITLE_BUY);
