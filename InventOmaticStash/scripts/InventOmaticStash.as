@@ -397,8 +397,6 @@ package
             }
             if(this.assignButtons && this.assignButtons.length > 0)
             {
-               Logger.get().info("OwnsVendor: " + this.OwnsVendor + ", MenuMode: " + this.MenuMode);
-               Logger.get().info("IsAssignSlotDataValid: " + this.IsAssignSlotDataValid() + ", fullSlots: " + this.AreAssignSlotsFull());
                if(this.IsAssignSlotDataValid() && !this.AreAssignSlotsFull())
                {
                   button = 0;
@@ -412,27 +410,24 @@ package
                            if(config.campAssignConfig.configs[i].assignMode == "VENDOR")
                            {
                               isValidMode = this.MenuMode == SecureTradeShared.MODE_VENDING_MACHINE && this.OwnsVendor;
-                              Logger.get().info("VENDOR: " + isValidMode);
                               this.assignButtons[button].ButtonEnabled = isValidMode;
                               this.assignButtons[button].ButtonVisible = isValidMode && Parser.parseBoolean(config.campAssignConfig.configs[i].showButton,DEFAULT_SHOW_BUTTON_STATE) && ItemWorker.isTheSameCharacterName(config.campAssignConfig.configs[i]);
                            }
                            else if(config.campAssignConfig.configs[i].assignMode == "DISPLAY")
                            {
                               isValidMode = this.MenuMode == SecureTradeShared.MODE_DISPLAY_CASE || this.MenuMode == SecureTradeShared.MODE_ALLY || this.MenuMode == SecureTradeShared.MODE_PET;
-                              Logger.get().info("DISPLAY: " + isValidMode);
                               this.assignButtons[button].ButtonEnabled = isValidMode;
                               this.assignButtons[button].ButtonVisible = isValidMode && Parser.parseBoolean(config.campAssignConfig.configs[i].showButton,DEFAULT_SHOW_BUTTON_STATE) && ItemWorker.isTheSameCharacterName(config.campAssignConfig.configs[i]);
                            }
                            else if(config.campAssignConfig.configs[i].assignMode == "OTHER")
                            {
                               isValidMode = this.MenuMode == SecureTradeShared.MODE_FERMENTER || this.MenuMode == SecureTradeShared.MODE_FREEZER || this.MenuMode == SecureTradeShared.MODE_REFRIGERATOR || this.MenuMode == SecureTradeShared.MODE_RECHARGER || this.MenuMode == SecureTradeShared.MODE_CAMP_DISPENSER;
-                              Logger.get().info("OTHER: " + isValidMode);
                               this.assignButtons[button].ButtonEnabled = isValidMode;
                               this.assignButtons[button].ButtonVisible = isValidMode && Parser.parseBoolean(config.campAssignConfig.configs[i].showButton,DEFAULT_SHOW_BUTTON_STATE) && ItemWorker.isTheSameCharacterName(config.campAssignConfig.configs[i]);
                            }
                            else
                            {
-                              Logger.get().info("INVALID MODE");
+                              Logger.get().info("Invalid assignMode: " + config.campAssignConfig.configs[i].assignMode);
                               this.assignButtons[button].ButtonEnabled = false;
                               this.assignButtons[button].ButtonVisible = false;
                            }
