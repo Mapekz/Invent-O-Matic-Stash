@@ -1550,6 +1550,8 @@ package
          var indexConfig:int;
          var dataTrimmed:String;
          var hexB64:String;
+         var keys:Array;
+         var output:String;
          if(param1.keyCode == Keyboard.SHIFT)
          {
             _shift = false;
@@ -1558,7 +1560,17 @@ package
          {
             Logger.get().info("KeyUp: " + param1.keyCode + "(" + Buttons.getButtonKey(param1.keyCode) + "), shift: " + _shift);
          }
-         if(param1.keyCode == Keyboard.F6)
+         if(param1.keyCode == Keyboard.F5)
+         {
+            keys = ["bksp","tab","enter","shift","ctrl","alt","pause","caps","esc","pgup","pgdn","end","home","left","up","right","down","ins","del","0","1","2","3","4","5","6","7","8","9","a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z","sel","n0","n1","n2","n3","n4","n5","n6","n7","n8","n9","n*","n+","n-","n.","n/","f1","f2","f3","f4","f5","f6","f7","f8","f9","f10","f11","f12","numlk","scrlk",";","=",",","-",".","/","`","\\","\'"];
+            output = "";
+            for each(key in keys)
+            {
+               output += key + ":" + Buttons.getButtonValue(key) + " (" + Buttons.getButtonKey(Buttons.getButtonValue(key)) + "), ";
+            }
+            Logger.get().info("keys: " + output);
+         }
+         else if(param1.keyCode == Keyboard.F6)
          {
             if(this.config.down != null)
             {

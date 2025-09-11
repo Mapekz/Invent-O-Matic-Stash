@@ -147,16 +147,10 @@ package
          if(config.transferConfig)
          {
             config.transferConfig = loadTransferConfig(config.transferConfig);
-            for(var c in config.transferConfig)
-            {
-               setName(config.transferConfig[c],TITLE_TRANSFER);
-               config.transferConfig[c].name = config.transferConfig[c].name.replace(_ID,c);
-               setMaxItems(config.transferConfig[c]);
-            }
          }
          else
          {
-            config.transferConfig = new Array();
+            config.transferConfig = [];
          }
          if(config.lootConfig)
          {
@@ -212,12 +206,11 @@ package
       {
          if(config)
          {
-            toggleDebugKeyCode = Parser.parsePositiveNumber(config.toggleDebugHotkey,toggleDebugKeyCode);
+            toggleDebugKeyCode = Parser.parseHotkey(config.toggleDebugHotkey,toggleDebugKeyCode);
             extractKeyCode = Parser.parseHotkey(config.extractConfig,extractKeyCode);
             scrapKeyCode = Parser.parseHotkey(config.scrapConfig,scrapKeyCode);
             lootKeyCode = Parser.parseHotkey(config.lootConfig,lootKeyCode);
             npcSellKeyCode = Parser.parseHotkey(config.npcSellConfig,npcSellKeyCode);
-            campAssignKeyCode = Parser.parseHotkey(config.campAssignConfig,campAssignKeyCode);
             if(config.protectionConfig)
             {
                lockAllKeyCode = Parser.parseHotkey(config.protectionConfig.itemLocking,lockAllKeyCode);
@@ -228,8 +221,12 @@ package
             {
                config.transferConfig[c].hotkey = Parser.parseHotkey(config.transferConfig[c],transferKeyCode);
             }
-            swapToPlayerInventoryHotkey = Parser.parsePositiveNumber(config.swapToPlayerInventoryHotkey,0);
-            swapToContainerInventoryHotkey = Parser.parsePositiveNumber(config.swapToContainerInventoryHotkey,0);
+            for(c in config.campAssignConfig.configs)
+            {
+               config.campAssignConfig.configs[c].hotkey = Parser.parseHotkey(config.campAssignConfig.configs[c],campAssignKeyCode);
+            }
+            swapToPlayerInventoryHotkey = Parser.parseHotkey(config.swapToPlayerInventoryHotkey,0);
+            swapToContainerInventoryHotkey = Parser.parseHotkey(config.swapToContainerInventoryHotkey,0);
          }
       }
       
@@ -286,9 +283,15 @@ package
       
       private static function loadTransferConfig(config:*) : *
       {
-         if(Object.prototype.toString.call(config) != ARRAY_DESC)
+         if(!(config is Array))
          {
-            return new Array(config);
+            config = [].concat(config);
+         }
+         for(var c in config)
+         {
+            setName(config[c],TITLE_TRANSFER);
+            config[c].name = config[c].name.replace(_ID,c);
+            setMaxItems(config[c]);
          }
          return config;
       }
@@ -302,11 +305,11 @@ package
          }
          for(c in config.configs)
          {
-            setName(config.configs[c],TITLE_ASSIGN);
             if(!config.configs[c].assignMode)
             {
                config.configs[c].assignMode = CampAssignContainer.OTHER;
             }
+            setName(config.configs[c],TITLE_ASSIGN);
             config.configs[c].name = config.configs[c].name.replace(_AMOUNT,AMOUNT).replace(AMOUNT,config.configs[c].amount);
          }
          return config;
