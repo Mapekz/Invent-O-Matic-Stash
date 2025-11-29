@@ -220,7 +220,7 @@ package
       
       public function set showCarryWeight(param1:Boolean) : void
       {
-         this.OfferWeight_tf.visible = param1;
+         this.OfferWeight_tf.visible = true;
          this.OfferWeightIcon.visible = param1;
       }
       
