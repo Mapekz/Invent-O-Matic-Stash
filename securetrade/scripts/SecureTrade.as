@@ -1252,7 +1252,7 @@ package
                "isPremium":this.selectedListEntry.isPremium
             },true,true));
          }
-         else
+         else if(!this.m_IsScrapConfirmModalActive)
          {
             this.updateOfferWeightDisplay();
             this.updateCategoryBar();
@@ -2748,6 +2748,16 @@ package
          this.disableInput = false;
       }
       
+      private function showNewTab() : Boolean
+      {
+         var _loc1_:* = false;
+         if((this.m_MenuMode == MODE_NPCVENDING || this.m_MenuMode == MODE_CONTAINER) && !this.m_CorpseLootMode)
+         {
+            _loc1_ = this.m_SubMenuMode != SecureTradeShared.SUB_MODE_GOLD_BULLION_VENDING_MACHINE;
+         }
+         return _loc1_;
+      }
+      
       private function updateCategoryBar() : void
       {
          this.m_HasNewTab = false;
@@ -2888,9 +2898,9 @@ package
          else
          {
             this.m_IsFilteredCategory = false;
-            if((this.m_MenuMode == MODE_NPCVENDING || this.m_MenuMode == MODE_CONTAINER) && !this.m_CorpseLootMode)
+            this.m_HasNewTab = this.showNewTab();
+            if(this.m_HasNewTab)
             {
-               this.m_HasNewTab = true;
                this.m_ItemFilters.push({
                   "text":"$InventoryCategoryNew",
                   "flag":FILTER_ALL
@@ -3049,7 +3059,7 @@ package
          else
          {
             this.CategoryBar_mc.maxVisible = maxtabs;
-            if((this.m_MenuMode == MODE_NPCVENDING || this.m_MenuMode == MODE_CONTAINER) && !this.m_CorpseLootMode)
+            if(this.m_HasNewTab)
             {
                this.CategoryBar_mc.AddLabel("$InventoryCategoryNew",FILTER_NEW_ID,true);
             }
