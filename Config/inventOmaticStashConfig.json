@@ -19,7 +19,7 @@
 	"defaultSelectedTab": "-",
 	"scrapItemCountThresholdPopup": 5,
 	"transferItemCountThresholdPopup": 4,
-	
+
 	"additionalColumnsConfig": {
 		"enabled": false,
 		"offsetInventories": 132,
@@ -46,7 +46,13 @@
 		"learnableFromArmorText": "[Learnable from Armor]",
 		"learnableFromWeaponText": "[Learnable from Weapon]",
 		"learnableTextColorStyle": "PREFIX",
-		"learnableTextColor": "0xff0000"
+		"learnableTextColor": "0xff0000",
+		"keepText": "[Keep]",
+		"keepTextColorStyle": "PREFIX",
+		"keepTextColor": "0x00cc44",
+		"keepLearnableText": "[Keep+Learnable]",
+		"keepLearnableTextColorStyle": "PREFIX",
+		"keepLearnableTextColor": "0xff00ff"
 	},
 	"categoryWeightConfig": {
 		"enabled": false,
@@ -346,7 +352,7 @@
 				"itemNames": ["Purified Water"]
 			}
 		]
-		
+
 	},
 	"lootConfig": {
 		"testRun": false,
