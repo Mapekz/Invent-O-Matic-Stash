@@ -4,7 +4,7 @@ package utils
    import Shared.AS3.Data.FromClientDataEvent;
    import Shared.AS3.Events.*;
    import Shared.AS3.SecureTradeShared;
-   import com.adobe.serialization.json.JSONDecoder;
+   import Shared.GlobalFunc;
    import com.adobe.serialization.json.JSONEncoder;
    import com.brokenfunction.json.JsonDecoderAsync;
    import extractors.GameApiDataExtractor;
@@ -21,6 +21,8 @@ package utils
       private static var _characterName:String;
       
       private static var _legendaryModsFromIni:Array;
+      
+      public static var allCharsLegendaryMods:Object;
       
       private static var RED:uint = 16711680;
       
@@ -45,11 +47,11 @@ package utils
       private static const LEGENDARY_MOD_CAVALIER_LOCALIZED:* = /(Cavalier|Caballero|Cavalier|Des Kavalleristen|Cavaliere|Rycerski|Cavaleiro|Кавалерская|騎士の|기병대의|骑兵的|騎兵)/i;
       
       private static const LEGENDARY_MOD_DEFENDER_LOCALIZED:* = /(Defender|Defensor|Défenseur|Des Verteidigers|Difensore|Obronny|Защитная|ディフェンダーの|방어자의|防御者的|護衛)/i;
-
+      
       private static var keepLearnablePrefix:* = "[Keep+Learnable]";
-
+      
       private static var keepPrefix:* = "[Keep]";
-
+      
       private static var learnablePrefix:* = "[Learnable]";
       
       private static var learnableArmorPrefix:* = "[Learnable from Armor]";
@@ -520,7 +522,6 @@ package utils
                   if(_legendaryModsFromIni)
                   {
                      callback(_legendaryModsFromIni);
-                     Logger.get().info("Legendary mods data loaded!");
                      i = 0;
                      while(i < 4)
                      {
@@ -563,93 +564,73 @@ package utils
          {
             return;
          }
-         if(Boolean(config.legendaryModsConfig.showUnknownModsAmongAllChars))
+         if(json.search(/\"modName\":\s*\"ImprovedWorkbench\"/) != -1)
          {
-            if(json.search(/\"modName\":\s*\"ImprovedWorkbench\"/) != -1)
+            var decoder:JsonDecoderAsync = new JsonDecoderAsync(json,false);
+            if(!decoder.process())
             {
-               var decoder:JsonDecoderAsync = new JsonDecoderAsync(json,false);
-               if(!decoder.process())
+               Logger.get().error("JSONDecoderAsync error: " + decoder.result);
+               return;
+            }
+            allCharsLegendaryMods = decoder.result;
+            var characterName:String = GameApiDataExtractor.getApiData("CharacterNameData").characterName;
+            var chars:Array = [];
+            for(var char in allCharsLegendaryMods.characterInventories)
+            {
+               if(Boolean(config.legendaryModsConfig.showUnknownModsAmongAllChars))
                {
-                  Logger.get().error("JSONDecoderAsync error: " + decoder.result);
-                  return;
+                  chars.push(char);
                }
-               var allCharsLegendaryMods:Object = decoder.result;
-               var chars:Array = [];
-               for(prop in allCharsLegendaryMods.characterInventories)
+               else if(characterName == char)
                {
-                  chars.push(prop);
+                  chars.push(char);
                }
-               if(allCharsLegendaryMods.characterInventories != null && chars.length > 0)
+            }
+            if(chars.length == 0)
+            {
+               Logger.get().error("Legendary data not found for current char: " + characterName);
+               return;
+            }
+            if(allCharsLegendaryMods.characterInventories != null)
+            {
+               var legendaryMods:Array = GlobalFunc.CloneObject(allCharsLegendaryMods.characterInventories[characterName].legendaryMods);
+               var legendaryModsMap:* = {};
+               for(var i in legendaryMods)
                {
-                  var legendaryMods:Array = allCharsLegendaryMods.characterInventories[chars[0]].legendaryMods;
-                  if(chars.length > 1)
+                  legendaryModsMap[legendaryMods[i].fullName] = legendaryMods[i];
+               }
+               if(chars.length > 1)
+               {
+                  for(var c in chars)
                   {
-                     for(var i in legendaryMods)
+                     if(chars[c] != characterName)
                      {
-                        if(!Boolean(legendaryMods[i].isLearned))
+                        var legendaryModsOther:Array = allCharsLegendaryMods.characterInventories[chars[c]].legendaryMods;
+                        for(i in legendaryModsOther)
                         {
-                           var char:int = 1;
-                           while(char < chars.length)
+                           if(legendaryModsOther[i].isLearned && legendaryModsMap[legendaryModsOther[i].fullName] != null && !legendaryModsMap[legendaryModsOther[i].fullName].isLearned)
                            {
-                              if(Boolean(allCharsLegendaryMods.characterInventories[chars[char]].legendaryMods[i].isLearned))
-                              {
-                                 legendaryMods[i].isLearned = true;
-                                 break;
-                              }
-                              char++;
+                              legendaryModsMap[legendaryModsOther[i].fullName].isLearned = true;
                            }
                         }
                      }
+                     c++;
                   }
-                  log("Legendary mods data loaded for " + chars.length + " characters: " + chars.join(", ") + "!");
-                  return legendaryMods;
+                  log("Legendary mods data loaded for " + chars.length + " characters: " + chars.join(", "));
                }
-               Logger.get().error("Legendary mods data not loaded, no characterInventories! " + allCharsLegendaryMods.characterInventories);
-            }
-            else
-            {
-               Logger.get().error("Legendary mods data not loaded, invalid extractor mod name");
-            }
-            return;
-         }
-         var characterName:* = GameApiDataExtractor.getApiData("CharacterNameData").characterName;
-         var searchString:* = "\"" + characterName + "\":{\"legendaryMods\":";
-         var characterNameIndex:* = json.indexOf(searchString);
-         if(characterNameIndex < 0)
-         {
-            Logger.get().error("Legendary data not found for current char: " + characterName);
-            return;
-         }
-         var itemModsJsonSplit:* = json.split(searchString);
-         if(itemModsJsonSplit.length < 2)
-         {
-            Logger.get().error("Legendary data not found");
-            return;
-         }
-         var legendaryModsListString:* = itemModsJsonSplit[1];
-         var arrayStartIndex:* = legendaryModsListString.indexOf("[");
-         var arrayEndIndex:* = -1;
-         var numOpenParens:* = 0;
-         i = 0;
-         while(i < legendaryModsListString.length)
-         {
-            if(legendaryModsListString.charAt(i) == "[")
-            {
-               numOpenParens++;
-            }
-            else if(legendaryModsListString.charAt(i) == "]")
-            {
-               numOpenParens--;
-               if(numOpenParens <= 0)
+               else
                {
-                  arrayEndIndex = i;
-                  break;
+                  log("Legendary mods data loaded for char: " + characterName);
                }
+               return legendaryMods;
             }
-            i++;
+            Logger.get().error("Legendary mods data not loaded, no characterInventories! " + allCharsLegendaryMods.characterInventories);
          }
-         legendaryModsListString = legendaryModsListString.slice(arrayStartIndex,arrayEndIndex + 1);
-         return new JSONDecoder(legendaryModsListString).getValue();
+         else
+         {
+            Logger.get().error("Legendary mods data not loaded, invalid extractor mod name");
+         }
       }
    }
 }
+

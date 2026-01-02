@@ -24,7 +24,7 @@ package
       
       private const DEFAULT_SHOW_BUTTON_STATE:Boolean = InventOmaticConfig.DEFAULT_SHOW_BUTTON_STATE;
       
-      private const CRAFTING_ITEM_UNLOCKED_REGEX:* = /(Crafting item unlocked|Objet de fabrication débloqué |Objeto de creación desbloqueado|Objeto de creación desbloqueado|Herstellungsgegenstand freigeschaltet|Oggetto creabile sbloccato|Odblokowujesz nową rzecz do tworzenia|Item de criação desbloqueado|Открыт предмет для изготовления|クラフトアイテムを解除|제작 아이템 잠금 해제|已解锁的物品制作|道具製作已解鎖)/;
+      private const CRAFTING_ITEM_UNLOCKED_REGEX:* = /(Crafting item unlocked: |Objet de fabrication débloqué : |Objeto de creación desbloqueado: |Herstellungsgegenstand freigeschaltet: |Oggetto creabile sbloccato: |Odblokowujesz nową rzecz do tworzenia: |Item de criação desbloqueado: |Открыт предмет для изготовления: |クラフトアイテムを解除：|제작 아이템 잠금 해제: |已解锁的物品制作：|道具製作已解鎖：)/;
       
       public var debugLogger:TextField;
       
@@ -210,6 +210,11 @@ package
          stage.scaleMode = "showAll";
       }
       
+      private function isSFEDefined() : Boolean
+      {
+         return this._parent.__SFCodeObj != null && this._parent.__SFCodeObj.call != null;
+      }
+      
       private function onCharacterInfoDataUpdate(param1:Event) : void
       {
          setTimeout(updateVendorCurrencyTextField,10);
@@ -218,18 +223,54 @@ package
       
       private function onHUDMessageProviderUpdate(param1:Event) : void
       {
-         if(config != null && Boolean(config.notifyLegendaryModLearnedOnScrap))
+         var i:int = 0;
+         while(i < param1.data.messages.length)
          {
-            var i:int = 0;
-            while(i < param1.data.messages.length)
+            if(param1.data.messages[i].messageText.indexOf("¬") != -1 && CRAFTING_ITEM_UNLOCKED_REGEX.test(param1.data.messages[i].messageText))
             {
-               if(param1.data.messages[i].messageText.indexOf("¬") != -1 && CRAFTING_ITEM_UNLOCKED_REGEX.test(param1.data.messages[i].messageText))
+               var legendaryModName:String = param1.data.messages[i].messageText.replace(CRAFTING_ITEM_UNLOCKED_REGEX,"");
+               if(legendaryModName.charAt(legendaryModName.length - 1) == ".")
+               {
+                  legendaryModName = legendaryModName.substr(0,legendaryModName.length - 1);
+               }
+               if(config != null && Boolean(config.notifyLegendaryModLearnedOnScrap))
                {
                   Logger.get().debugMode = true;
                   Logger.get().info(param1.data.messages[i].messageText);
                }
-               i++;
+               if(LegendaryMods.allCharsLegendaryMods)
+               {
+                  var charName:String = BSUIDataManager.GetDataFromClient("CharacterNameData").data.characterName;
+                  if(LegendaryMods.allCharsLegendaryMods.characterInventories && LegendaryMods.allCharsLegendaryMods.characterInventories[charName] && LegendaryMods.allCharsLegendaryMods.characterInventories[charName].legendaryMods)
+                  {
+                     var legendaryMods:Array = LegendaryMods.allCharsLegendaryMods.characterInventories[charName].legendaryMods;
+                     var j:int = 0;
+                     while(j < legendaryMods.length)
+                     {
+                        if(!legendaryMods[j].isLearned && legendaryMods[j].fullName == legendaryModName)
+                        {
+                           Logger.get().info("Updating isLearned in file for: " + legendaryModName);
+                           legendaryMods[j].isLearned = true;
+                           if(this.isSFEDefined())
+                           {
+                              this._parent.__SFCodeObj.call("writeLegendaryModsFile",toString(LegendaryMods.allCharsLegendaryMods));
+                           }
+                           else
+                           {
+                              Logger.get().error("Error updating isLearned in file, SFE not found!");
+                           }
+                           break;
+                        }
+                        j++;
+                     }
+                     if(j == legendaryMods.length)
+                     {
+                        Logger.get().error("Error updating isLearned in file, " + legendaryModName + " not found!");
+                     }
+                  }
+               }
             }
+            i++;
          }
       }
       
