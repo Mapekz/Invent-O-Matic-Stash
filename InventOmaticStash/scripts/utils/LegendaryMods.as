@@ -78,7 +78,10 @@ package utils
       
       private static function log(message:String) : void
       {
-         Logger.get().info(message);
+         if(config && config.legendaryModsConfig && config.legendaryModsConfig.debug)
+         {
+            Logger.get().info(message);
+         }
       }
       
       private static function toString(param1:Object) : String
@@ -616,11 +619,11 @@ package utils
                      }
                      c++;
                   }
-                  log("Legendary mods data loaded for " + chars.length + " characters: " + chars.join(", "));
+                  Logger.get().info("Legendary mods data loaded for " + chars.length + " characters: " + chars.join(", "));
                }
                else
                {
-                  log("Legendary mods data loaded for char: " + characterName);
+                  Logger.get().info("Legendary mods data loaded for char: " + characterName);
                }
                return legendaryMods;
             }
