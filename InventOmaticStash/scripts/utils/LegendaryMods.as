@@ -48,6 +48,8 @@ package utils
       
       private static const LEGENDARY_MOD_DEFENDER_LOCALIZED:* = /(Defender|Defensor|Défenseur|Des Verteidigers|Difensore|Obronny|Защитная|ディフェンダーの|방어자의|防御者的|護衛)/i;
       
+      private static const LEGENDARY_MODBOX_TYPE_PREFIX:* = /^\[[^\]]+\]\s*/;
+      
       private static var keepLearnablePrefix:* = "[Keep+Learnable]";
       
       private static var keepPrefix:* = "[Keep]";
@@ -215,67 +217,55 @@ package utils
                   var activePowerArmorPrefix:* = currentMod.isKept ? (currentMod.isLearned ? keepPrefix : keepLearnablePrefix) : learnablePowerArmorPrefix;
                   var activeWeaponPrefix:* = currentMod.isKept ? (currentMod.isLearned ? keepPrefix : keepLearnablePrefix) : learnableWeaponPrefix;
                   var descObj:* = currentMod.description;
-                  var descBase:* = "";
+                  
+                  // Helper to add both starred and non-starred versions
+                  var addModDesc:Function = function(baseDesc:String, prefix:String):void {
+                     var descWithStars:String = baseDesc + " " + starsText;
+                     legendaryModsByDesc[descWithStars] = prefix + " " + descWithStars;
+                     if(config.legendaryModsConfig.showOnModItems)
+                     {
+                        legendaryModsByDesc[baseDesc] = prefix + " " + baseDesc;
+                     }
+                  };
+                  
+                  // Helper that only adds if the starred key doesn't exist; returns true if added
+                  var addModDescIfNew:Function = function(baseDesc:String, prefix:String):Boolean {
+                     var descWithStars:String = baseDesc + " " + starsText;
+                     if(!legendaryModsByDesc[descWithStars])
+                     {
+                        addModDesc(baseDesc, prefix);
+                        return true;
+                     }
+                     return false;
+                  };
+                  
                   if(descObj.all)
                   {
-                     descBase = descObj.all + " " + starsText;
-                     legendaryModsByDesc[descBase] = activePrefix + " " + descBase;
+                     addModDesc(descObj.all, activePrefix);
                   }
                   else if(currentMod.name.search(LEGENDARY_MOD_CAVALIER_LOCALIZED) != -1)
                   {
-                     descBase = descObj.armor + " " + starsText;
-                     legendaryModsByDesc[descBase] = activePrefix + " " + descBase;
-                     descBase = descObj.weapons + " " + starsText;
-                     if(!legendaryModsByDesc[descBase])
+                     addModDesc(descObj.armor, activePrefix);
+                     if(!addModDescIfNew(descObj.weapons, activeWeaponPrefix))
                      {
-                        legendaryModsByDesc[descBase] = activeWeaponPrefix + " " + descBase;
-                     }
-                     else
-                     {
-                        legendaryModsByDesc[descBase] = activePrefix + " " + descBase;
+                        addModDesc(descObj.weapons, activePrefix);
                      }
                   }
                   else if(currentMod.name.search(LEGENDARY_MOD_DEFENDER_LOCALIZED) != -1)
                   {
-                     descBase = descObj.weapons + " " + starsText;
-                     legendaryModsByDesc[descBase] = activePrefix + " " + descBase;
-                     descBase = descObj.armor + " " + starsText;
-                     if(!legendaryModsByDesc[descBase])
+                     addModDesc(descObj.weapons, activePrefix);
+                     if(!addModDescIfNew(descObj.armor, activeArmorPrefix))
                      {
-                        legendaryModsByDesc[descBase] = activeArmorPrefix + " " + descBase;
-                     }
-                     else
-                     {
-                        legendaryModsByDesc[descBase] = activePrefix + " " + descBase;
+                        addModDesc(descObj.armor, activePrefix);
                      }
                   }
                   else
                   {
-                     if(descObj.melee)
-                     {
-                        descBase = descObj.melee + " " + starsText;
-                        legendaryModsByDesc[descBase] = activePrefix + " " + descBase;
-                     }
-                     if(descObj.ranged)
-                     {
-                        descBase = descObj.ranged + " " + starsText;
-                        legendaryModsByDesc[descBase] = activePrefix + " " + descBase;
-                     }
-                     if(descObj.weapons)
-                     {
-                        descBase = descObj.weapons + " " + starsText;
-                        legendaryModsByDesc[descBase] = activePrefix + " " + descBase;
-                     }
-                     if(descObj.armor)
-                     {
-                        descBase = descObj.armor + " " + starsText;
-                        legendaryModsByDesc[descBase] = activePrefix + " " + descBase;
-                     }
-                     if(descObj.powerArmor)
-                     {
-                        descBase = descObj.powerArmor + " " + starsText;
-                        legendaryModsByDesc[descBase] = activePrefix + " " + descBase;
-                     }
+                     if(descObj.melee) addModDesc(descObj.melee, activePrefix);
+                     if(descObj.ranged) addModDesc(descObj.ranged, activePrefix);
+                     if(descObj.weapons) addModDesc(descObj.weapons, activePrefix);
+                     if(descObj.armor) addModDesc(descObj.armor, activePrefix);
+                     if(descObj.powerArmor) addModDesc(descObj.powerArmor, activePrefix);
                   }
                }
                i++;
@@ -395,7 +385,25 @@ package utils
          {
             if(descParts[i].indexOf("¬") == -1)
             {
-               descLines.push(descParts[i]);
+               if(config.legendaryModsConfig.showOnModItems)
+               {
+                  var modboxTypePrefix:* = (descParts[i].match(LEGENDARY_MODBOX_TYPE_PREFIX) || [])[0] || "";
+                  var lookupDescNoStars:* = descParts[i].replace(LEGENDARY_MODBOX_TYPE_PREFIX,"").replace(LEGENDARY_MOD_CURRENTLY_REGEX,"").replace(/^\s+|\s+$/g,"");
+                  if(lookupDescNoStars.length > 0 && _legendaryModsByDesc[lookupDescNoStars])
+                  {
+                     var fullMatch:* = _legendaryModsByDesc[lookupDescNoStars];
+                     var learnPrefix:* = fullMatch.substring(0, fullMatch.length - lookupDescNoStars.length);
+                     descLines.push(learnPrefix + modboxTypePrefix + lookupDescNoStars);
+                  }
+                  else
+                  {
+                     descLines.push(descParts[i]);
+                  }
+               }
+               else
+               {
+                  descLines.push(descParts[i]);
+               }
             }
             else
             {

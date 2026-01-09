@@ -37,6 +37,7 @@
 	},
 	"legendaryModsConfig": {
 		"enabled": false,
+		"showOnModItems": true,
 		"showUnknownModsAmongAllChars": false,
 		"showInWorkbench": true,
 		"showInStash": true,
